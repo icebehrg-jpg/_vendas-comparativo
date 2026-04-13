@@ -27,6 +27,23 @@
             --card-radius: 1rem;
         }
 
+        /* Tema escuro */
+        body.dark {
+            --blue-dark: #8bb9e0;
+            --blue-main: #4a9eff;
+            --blue-light: #6aaee0;
+            --blue-pale: #2a3a4c;
+            --blue-ghost: #1e2a36;
+            --success: #2ecc71;
+            --danger: #e67e22;
+            --text-main: #eef2f8;
+            --text-muted: #9ab3cf;
+            --border: #2c3e4e;
+            --bg: #121826;
+            --white: #1e2936;
+            --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -36,6 +53,7 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
             color: var(--text-main);
             margin: 0;
+            transition: background 0.2s, color 0.2s;
         }
 
         /* ===== HEADER ===== */
@@ -50,41 +68,17 @@
         .dashboard-header .inner {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 10px 16px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            justify-content: flex-end;
+            gap: 6px;
             flex-wrap: wrap;
-        }
-
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-brand i {
-            font-size: 1.5rem;
-            color: var(--blue-main);
-        }
-
-        .header-brand h5 {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--blue-dark);
-        }
-
-        .header-brand p {
-            margin: 0;
-            font-size: 0.72rem;
-            color: var(--text-muted);
         }
 
         .header-actions {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             flex-wrap: wrap;
         }
 
@@ -93,7 +87,7 @@
             color: var(--blue-main);
             border: 1px solid var(--blue-pale);
             border-radius: 30px;
-            padding: 5px 14px;
+            padding: 4px 10px;
             font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
@@ -106,35 +100,35 @@
         }
 
         .btn-ghost i {
-            margin-right: 4px;
+            margin-right: 0;
         }
 
         /* ===== MAIN ===== */
         main {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 14px 16px 32px;
+            padding: 12px 16px 24px;
         }
 
         .timestamp-bar {
             text-align: right;
             font-size: 0.72rem;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         /* ===== CARDS PRINCIPAIS ===== */
         .cards-main {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         @media(max-width: 700px) {
             .cards-main {
                 grid-template-columns: 1fr;
-                gap: 8px;
+                gap: 6px;
             }
         }
 
@@ -142,7 +136,7 @@
             background: var(--white);
             border-radius: var(--card-radius);
             box-shadow: var(--card-shadow);
-            padding: 18px 16px 14px;
+            padding: 12px 12px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -150,7 +144,7 @@
             border: 2px solid transparent;
             cursor: pointer;
             transition: all 0.18s;
-            min-height: 110px;
+            min-height: 100px;
             justify-content: center;
         }
 
@@ -162,6 +156,10 @@
         .card-main.filter-active {
             border-color: var(--blue-main);
             background: #eaf3fd;
+        }
+
+        body.dark .card-main.filter-active {
+            background: #253746;
         }
 
         .card-label {
@@ -190,21 +188,21 @@
         }
 
         .card-growth {
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         /* ===== CARDS SECUNDÁRIOS ===== */
         .cards-secondary {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 14px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
-        @media(max-width: 600px) {
+        @media(max-width: 700px) {
             .cards-secondary {
                 grid-template-columns: 1fr;
-                gap: 8px;
+                gap: 6px;
             }
         }
 
@@ -212,7 +210,7 @@
             background: var(--white);
             border-radius: var(--card-radius);
             border: 1px solid var(--border);
-            padding: 12px 16px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -230,6 +228,10 @@
             border-color: var(--blue-main);
             background: #eaf3fd;
             opacity: 1;
+        }
+
+        body.dark .card-sec.filter-active {
+            background: #253746;
         }
 
         .sec-label {
@@ -293,8 +295,8 @@
             background: var(--white);
             border-radius: var(--card-radius);
             box-shadow: var(--card-shadow);
-            padding: 16px;
-            margin-bottom: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
         }
 
         .chart-card canvas {
@@ -302,37 +304,31 @@
             width: 100%;
         }
 
-        .chart-hint {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 8px;
-        }
-
         /* ===== TABELA ===== */
         .table-card {
             background: var(--white);
             border-radius: var(--card-radius);
             box-shadow: var(--card-shadow);
-            padding: 16px;
+            padding: 12px;
         }
 
         .table-card h6 {
             font-size: 0.85rem;
             font-weight: 700;
             color: var(--blue-dark);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .table-responsive {
+            overflow-x: auto;
             border-radius: 0.5rem;
-            overflow: hidden;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.82rem;
+            min-width: 500px;
         }
 
         thead tr {
@@ -340,7 +336,7 @@
         }
 
         thead th {
-            padding: 9px 10px;
+            padding: 6px 8px;
             font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -355,6 +351,10 @@
             transition: background 0.1s;
         }
 
+        body.dark tbody tr {
+            border-bottom-color: #2c3e4e;
+        }
+
         tbody tr:hover {
             background: var(--blue-ghost);
         }
@@ -365,7 +365,7 @@
         }
 
         tbody td {
-            padding: 8px 10px;
+            padding: 6px 8px;
             vertical-align: middle;
         }
 
@@ -375,14 +375,14 @@
             background: var(--blue-ghost);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 2px 8px;
+            padding: 2px 6px;
             white-space: nowrap;
         }
 
         .footer-note {
             font-size: 0.7rem;
             color: var(--text-muted);
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         /* ===== TABELA MELHORADA ===== */
@@ -395,13 +395,8 @@
             color: var(--text-muted);
         }
 
-        .col-real {
+        .col-real-proj {
             text-align: right;
-        }
-
-        .col-proj {
-            text-align: right;
-            color: var(--blue-light);
         }
 
         .col-badge {
@@ -424,12 +419,8 @@
             color: var(--text-muted) !important;
         }
 
-        thead th.col-real {
+        thead th.col-real-proj {
             color: var(--blue-dark) !important;
-        }
-
-        thead th.col-proj {
-            color: var(--blue-light) !important;
         }
 
         thead th.col-filter {
@@ -438,9 +429,12 @@
             font-size: 0.65rem;
         }
 
-        /* Linhas realizadas vs projetadas */
         tr.row-done {
             background: #fff;
+        }
+
+        body.dark tr.row-done {
+            background: var(--white);
         }
 
         tr.row-done:hover {
@@ -449,6 +443,10 @@
 
         tr.row-proj {
             background: #fafbfd;
+        }
+
+        body.dark tr.row-proj {
+            background: #1a222c;
         }
 
         tr.row-proj td {
@@ -460,13 +458,16 @@
             background: var(--blue-ghost);
         }
 
-        /* Barra de progresso mini */
         .mini-bar-wrap {
             height: 3px;
             background: #eef2f7;
             border-radius: 2px;
             margin-top: 4px;
             overflow: hidden;
+        }
+
+        body.dark .mini-bar-wrap {
+            background: #2a3a4c;
         }
 
         .mini-bar {
@@ -479,10 +480,12 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            gap: 4px;
         }
 
         .proj-val {
             color: var(--blue-light);
+            font-style: italic;
         }
 
         .dash-cell {
@@ -490,20 +493,18 @@
             font-size: 0.8rem;
         }
 
-        /* Separador visual entre blocos hora anterior / ano anterior */
         tbody td.col-anoant {
             border-right: 1px solid var(--border);
         }
 
-        /* Highlight row quando realizado > anoAnterior */
-        tr.row-done td.col-real strong {
+        tr.row-done td.col-real-proj strong {
             color: var(--blue-dark);
         }
 
         /* ===== MOBILE ===== */
         @media(max-width: 480px) {
             main {
-                padding: 10px 10px 24px;
+                padding: 8px 10px 16px;
             }
 
             .card-value {
@@ -520,7 +521,7 @@
 
             thead th,
             tbody td {
-                padding: 6px 6px;
+                padding: 4px 5px;
             }
         }
     </style>
@@ -530,16 +531,16 @@
 
     <header class="dashboard-header">
         <div class="inner">
-            <div class="header-brand">
-                <i class="bi bi-graph-up-arrow"></i>
-                <div>
-                    <h5>Vendas | Projeção (Ano anterior)</h5>
-                    <p>Dados atualizados automaticamente via Google Sheets</p>
-                </div>
-            </div>
             <div class="header-actions">
-                <button class="btn-ghost" id="btnResetFiltros"><i class="bi bi-arrow-repeat"></i> Limpar</button>
-                <button class="btn-ghost" id="btnAtualizar"><i class="bi bi-cloud-arrow-down"></i> Atualizar</button>
+                <button class="btn-ghost" id="btnResetFiltros" title="Limpar filtros">
+                    <i class="bi bi-eraser"></i>
+                </button>
+                <button class="btn-ghost" id="btnAtualizar" title="Atualizar dados">
+                    <i class="bi bi-arrow-repeat"></i>
+                </button>
+                <button class="btn-ghost" id="btnDarkMode" title="Alternar modo noturno">
+                    <i class="bi bi-moon-stars" id="darkModeIcon"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -547,7 +548,6 @@
     <main>
         <div class="timestamp-bar" id="timestampApi">Carregando dados...</div>
 
-        <!-- CARDS PRINCIPAIS: Realizado | Projetado | Ano Anterior -->
         <div class="cards-main">
             <div class="card-main filter-card" data-filter="realizado" id="cardRealizado">
                 <div class="card-label"><i class="bi bi-check-circle-fill" style="color:#1e8c5a"></i> Realizado</div>
@@ -566,31 +566,35 @@
             </div>
         </div>
 
-        <!-- CARDS SECUNDÁRIOS: menor destaque -->
         <div class="cards-secondary">
             <div class="card-sec filter-card" data-filter="semanaAnterior" id="cardSemanaAnt">
                 <div>
-                    <div class="sec-label"><i class="bi bi-calendar-week"></i> Semana Anterior</div>
+                    <div class="sec-label"><i class="bi bi-calendar-week"></i> Semana Passada</div>
                     <div class="sec-value" id="totalSemanaAnt">--</div>
                 </div>
                 <div class="sec-right" id="diffSemanaAnt"></div>
             </div>
             <div class="card-sec filter-card" data-filter="diaAnterior" id="cardDiaAnt">
                 <div>
-                    <div class="sec-label"><i class="bi bi-calendar-day"></i> Dia Anterior</div>
+                    <div class="sec-label"><i class="bi bi-calendar-day"></i> Ontem</div>
                     <div class="sec-value" id="totalDiaAnt">--</div>
                 </div>
                 <div class="sec-right" id="diffDiaAnt"></div>
             </div>
+            <!-- Card Realizado (exc. 00h‑06h) com comparação apenas nas horas já realizadas -->
+            <div class="card-sec" id="cardSemMadrugada">
+                <div>
+                    <div class="sec-label"><i class="bi bi-sun"></i> Sem Boleto</div>
+                    <div class="sec-value" id="totalRealizadoSemMadrugada">--</div>
+                </div>
+                <div class="sec-right" id="crescimentoSemMadrugada"></div>
+            </div>
         </div>
 
-        <!-- GRÁFICO -->
         <div class="chart-card">
             <canvas id="salesChart"></canvas>
-            <p class="chart-hint">Clique nos cards acima para ativar/desativar séries no gráfico</p>
         </div>
 
-        <!-- TABELA: Realizado x Ano Anterior por hora -->
         <div class="table-card">
             <h6><i class="bi bi-table"></i> Detalhamento por faixa horária — Atual vs Ano Anterior</h6>
             <div class="table-responsive">
@@ -601,13 +605,20 @@
             </div>
             <div class="footer-note"><i class="bi bi-info-circle"></i> A barra colorida indica realizado vs ano
                 anterior. <strong>Verde</strong> = acima, <strong>Vermelho</strong> = abaixo. Linhas em itálico = horas
-                ainda não realizadas. Coluna extra aparece ao ativar filtro Semana/Dia Anterior.</div>
+                ainda não realizadas (exibem o valor projetado). Coluna extra aparece ao ativar filtro Semana/Dia
+                Anterior.</div>
         </div>
     </main>
 
     <script>
         // ================== CONFIGURAÇÃO ==================
         const HORARIOS = ["00:00/06:59", "07:00/07:59", "08:00/08:59", "09:00/09:59", "10:00/10:59", "11:00/11:59", "12:00/12:59", "13:00/13:59", "14:00/14:59", "15:00/15:59", "16:00/16:59", "17:00/17:59", "18:00/18:59", "19:00/19:59", "20:00/20:59", "21:00/21:59", "22:00/22:59", "23:00/23:59"];
+        // Labels para mobile (compacto)
+        const HORARIOS_MOBILE = [
+            "00 | 07", "07 | 08", "08 | 09", "09 | 10", "10 | 11", "11 | 12",
+            "12 | 13", "13 | 14", "14 | 15", "15 | 16", "16 | 17", "17 | 18",
+            "18 | 19", "19 | 20", "20 | 21", "21 | 22", "22 | 23", "23 | 00"
+        ];
         const EXPECTED_ROWS = 18;
         const URL_API = 'https://script.google.com/macros/s/AKfycbwRPZA1Tqig3RTzvEWtnFCRaQLbgfwHHB12lZQeCSGieba7KHAwcQfRiSW4n_-Q7K_R/exec';
 
@@ -620,12 +631,52 @@
         let participacao = new Array(EXPECTED_ROWS).fill(0);
         let projecaoHoraria = new Array(EXPECTED_ROWS).fill(0);
         let totalAnoAnt = 0, totalSemanaAnt = 0, totalDiaAnt = 0, totalRealizado = 0, projecaoFinal = 0;
+        // Novos totais sem a primeira hora (índice 0) e considerando apenas horas realizadas
+        let totalRealizadoSemMadrugada = 0;
+        let totalAnoAntSemMadrugada = 0;
 
-        // Determina índice da hora atual (0–17)
-        function getHoraAtualIdx() {
-            const h = new Date().getHours();
-            if (h < 7) return 0;
-            return Math.min(h - 6, 17); // idx 1 = 07h, idx 2 = 08h ... idx 17 = 23h
+        // Dark mode
+        function initDarkMode() {
+            const stored = localStorage.getItem('darkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = stored === 'true' || (stored === null && prefersDark);
+            if (isDark) {
+                document.body.classList.add('dark');
+                document.getElementById('darkModeIcon').classList.remove('bi-moon-stars');
+                document.getElementById('darkModeIcon').classList.add('bi-sun');
+            } else {
+                document.body.classList.remove('dark');
+                document.getElementById('darkModeIcon').classList.remove('bi-sun');
+                document.getElementById('darkModeIcon').classList.add('bi-moon-stars');
+            }
+        }
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark');
+            const icon = document.getElementById('darkModeIcon');
+            if (isDark) {
+                icon.classList.remove('bi-moon-stars');
+                icon.classList.add('bi-sun');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                icon.classList.remove('bi-sun');
+                icon.classList.add('bi-moon-stars');
+                localStorage.setItem('darkMode', 'false');
+            }
+            rebuildChart();
+        }
+        document.getElementById('btnDarkMode').addEventListener('click', toggleDarkMode);
+        initDarkMode();
+
+        function isMobile() {
+            return window.innerWidth < 768;
+        }
+
+        function getChartLabels() {
+            return isMobile() ? HORARIOS_MOBILE : HORARIOS;
+        }
+
+        function getTableLabel(idx) {
+            return isMobile() ? HORARIOS_MOBILE[idx] : HORARIOS[idx];
         }
 
         function fmt(v) { return (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
@@ -636,11 +687,21 @@
             return `<span class="badge-down">▼ ${fmtPct(val)}</span>`;
         }
 
-        // ================== PROJEÇÃO ==================
         function calcularProjecao() {
             totalAnoAnt = anoAnterior.reduce((a, b) => a + (b || 0), 0);
             totalSemanaAnt = semanaAnterior.reduce((a, b) => a + (b || 0), 0);
             totalDiaAnt = diaAnterior.reduce((a, b) => a + (b || 0), 0);
+
+            // Totais sem a primeira faixa (índice 0) - APENAS para as horas que já possuem realizado
+            totalRealizadoSemMadrugada = 0;
+            totalAnoAntSemMadrugada = 0;
+            for (let i = 1; i < EXPECTED_ROWS; i++) {
+                if (realizado[i] > 0) {
+                    totalRealizadoSemMadrugada += realizado[i];
+                    totalAnoAntSemMadrugada += anoAnterior[i] || 0;
+                }
+            }
+
             for (let i = 0; i < EXPECTED_ROWS; i++)
                 participacao[i] = totalAnoAnt ? anoAnterior[i] / totalAnoAnt : 0;
             totalRealizado = 0;
@@ -653,18 +714,15 @@
                 projecaoHoraria[i] = (realizado[i] > 0) ? realizado[i] : projecaoFinal * participacao[i];
         }
 
-        // ================== CARDS ==================
         function updateCards() {
             document.getElementById('totalRealizado').textContent = fmt(totalRealizado);
             document.getElementById('projecaoFinal').textContent = fmt(projecaoFinal);
             document.getElementById('totalAnoAnt').textContent = fmt(totalAnoAnt);
 
-            // Badge Projetado vs Ano Anterior
             let growthProj = totalAnoAnt ? ((projecaoFinal - totalAnoAnt) / totalAnoAnt) * 100 : 0;
             document.getElementById('crescimentoProj').innerHTML =
                 badgeGrowth(growthProj) + `<div style="font-size:0.67rem;color:var(--text-muted);margin-top:3px">proj vs ano anterior</div>`;
 
-            // Badge Realizado vs Ano Anterior — apenas horas já executadas (mesmas horas)
             let somaAnoAntMesmasHoras = 0;
             let horasRealizadasIdx = [];
             for (let i = 0; i < EXPECTED_ROWS; i++) {
@@ -676,26 +734,30 @@
             let crescElReal = document.getElementById('crescimentoReal');
             if (horasRealizadasIdx.length > 0 && somaAnoAntMesmasHoras > 0) {
                 let growthReal = ((totalRealizado - somaAnoAntMesmasHoras) / somaAnoAntMesmasHoras) * 100;
-                crescElReal.innerHTML =
-                    badgeGrowth(growthReal) + `<div style="font-size:0.67rem;color:var(--text-muted);margin-top:3px">real vs ano ant. (mesmas hrs)</div>`;
+                crescElReal.innerHTML = badgeGrowth(growthReal) + `<div style="font-size:0.67rem;color:var(--text-muted);margin-top:3px">real vs ano ant. (mesmas hrs)</div>`;
             } else {
                 crescElReal.innerHTML = '';
             }
 
-            // Secundários
             document.getElementById('totalSemanaAnt').textContent = fmt(totalSemanaAnt);
             document.getElementById('totalDiaAnt').textContent = fmt(totalDiaAnt);
 
             let diffSem = totalSemanaAnt ? ((projecaoFinal - totalSemanaAnt) / totalSemanaAnt) * 100 : 0;
             let diffDia = totalDiaAnt ? ((projecaoFinal - totalDiaAnt) / totalDiaAnt) * 100 : 0;
 
-            document.getElementById('diffSemanaAnt').innerHTML =
-                badgeGrowth(diffSem) + `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:2px">proj vs sem. ant.</div>`;
-            document.getElementById('diffDiaAnt').innerHTML =
-                badgeGrowth(diffDia) + `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:2px">proj vs dia ant.</div>`;
+            document.getElementById('diffSemanaAnt').innerHTML = badgeGrowth(diffSem) + `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:2px">proj vs sem. ant.</div>`;
+            document.getElementById('diffDiaAnt').innerHTML = badgeGrowth(diffDia) + `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:2px">proj vs dia ant.</div>`;
+
+            // Card sem madrugada
+            document.getElementById('totalRealizadoSemMadrugada').textContent = totalRealizadoSemMadrugada > 0 ? fmt(totalRealizadoSemMadrugada) : '--';
+            if (totalRealizadoSemMadrugada > 0 && totalAnoAntSemMadrugada > 0) {
+                let growthSemMadrugada = ((totalRealizadoSemMadrugada - totalAnoAntSemMadrugada) / totalAnoAntSemMadrugada) * 100;
+                document.getElementById('crescimentoSemMadrugada').innerHTML = badgeGrowth(growthSemMadrugada) + `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:2px">real vs ano ant. (mesmas hrs, exc. 00‑06h)</div>`;
+            } else {
+                document.getElementById('crescimentoSemMadrugada').innerHTML = '<span class="dash-cell">—</span>';
+            }
         }
 
-        // ================== GRÁFICO ==================
         function rebuildChart() {
             if (currentChart) currentChart.destroy();
             const ctx = document.getElementById('salesChart').getContext('2d');
@@ -703,13 +765,11 @@
             const realizadoSerie = realizado.map(v => v > 0 ? v : null);
             const projetadoSerie = projecaoHoraria.map((v, i) => realizado[i] > 0 ? null : v);
 
-            // Linha de intersecção: une o último ponto realizado ao primeiro ponto projetado
-            // Fica sempre no mesmo dataset 'projecao' (mesma cor/estilo, mas sólida)
-            const intersecaoSerie = new Array(EXPECTED_ROWS).fill(null);
             let lastRealIdx = -1;
             for (let i = 0; i < EXPECTED_ROWS; i++) if (realizado[i] > 0) lastRealIdx = i;
+            const intersecaoSerie = new Array(EXPECTED_ROWS).fill(null);
             if (lastRealIdx >= 0 && lastRealIdx + 1 < EXPECTED_ROWS) {
-                intersecaoSerie[lastRealIdx] = projecaoHoraria[lastRealIdx]; // mesmo valor do realizado
+                intersecaoSerie[lastRealIdx] = projecaoHoraria[lastRealIdx];
                 intersecaoSerie[lastRealIdx + 1] = projecaoHoraria[lastRealIdx + 1];
             }
 
@@ -740,14 +800,13 @@
                     fill: false,
                 },
                 {
-                    // Linha de ponte entre realizado e projetado — agrupada visualmente com projecao
-                    id: 'projecao', // mesmo id para herdar visibilidade do filtro projecao
+                    id: 'projecao',
                     _bridgeOnly: true,
-                    label: null, // sem legenda própria
+                    label: null,
                     data: intersecaoSerie,
                     borderColor: '#85bef0',
                     borderWidth: 2.5,
-                    borderDash: [],      // sólida para indicar transição
+                    borderDash: [],
                     tension: 0,
                     pointRadius: 0,
                     pointHoverRadius: 0,
@@ -787,15 +846,10 @@
                 }
             ];
 
-            // Visibilidade:
-            // - Sem filtros: realizado + projecao (+ ponte) + anoAnterior sempre visíveis
-            // - Com filtros: segue filtros; anoAnterior aparece SEMPRE como referência de base
             allDatasets.forEach(ds => {
                 if (activeFilters.size === 0) {
-                    // estado padrão — realizado, projecao e anoAnterior visíveis
                     ds.hidden = !['realizado', 'projecao', 'anoAnterior'].includes(ds.id);
                 } else {
-                    // com filtros: anoAnterior sempre visível como referência; ponte segue projecao
                     if (ds.id === 'anoAnterior') {
                         ds.hidden = false;
                     } else {
@@ -804,18 +858,19 @@
                 }
             });
 
-            // Plugin customizado: suprimir a linha de ponte da legenda
             const bridgeDatasetIndex = allDatasets.findIndex(ds => ds._bridgeOnly);
+            const showLegend = !isMobile();
 
             currentChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels: HORARIOS, datasets: allDatasets },
+                data: { labels: getChartLabels(), datasets: allDatasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: {
+                            display: showLegend,
                             position: 'top',
                             labels: {
                                 boxWidth: 14, font: { size: 11 }, padding: 14,
@@ -833,7 +888,7 @@
                         }
                     },
                     scales: {
-                        x: { ticks: { font: { size: 10 } }, grid: { color: '#f0f3f8' } },
+                        x: { ticks: { font: { size: isMobile() ? 8 : 10, maxRotation: 45, autoSkip: true } }, grid: { color: '#f0f3f8' } },
                         y: {
                             ticks: {
                                 font: { size: 10 },
@@ -846,9 +901,7 @@
             });
         }
 
-        // ================== TABELA ==================
         function renderTable() {
-            // Detecta filtro de data ativo (semana ou dia anterior)
             const filterDataMap = {
                 semanaAnterior: { label: 'Sem. Ant.', data: semanaAnterior, color: '#8fafc8' },
                 diaAnterior: { label: 'Dia Ant.', data: diaAnterior, color: '#a0b8cc' },
@@ -856,7 +909,6 @@
             const activeDataFilter = [...activeFilters].find(f => filterDataMap[f]);
             const filterInfo = activeDataFilter ? filterDataMap[activeDataFilter] : null;
 
-            // Cabeçalho: Horário | Ano Anterior | Realizado | Projetado | Realiz. vs Ano Ant. | [filtro?]
             let headerExtra = filterInfo
                 ? `<th class="col-filter"><i class="bi bi-funnel-fill"></i> ${filterInfo.label}</th>`
                 : '';
@@ -864,9 +916,8 @@
             document.getElementById('tableHeader').innerHTML = `<tr>
                 <th class="col-hora">Horário</th>
                 <th class="col-anoant">Ano Anterior</th>
-                <th class="col-real">Realizado</th>
-                <th class="col-proj">Projetado</th>
-                <th class="col-badge">Realiz. vs Ano Ant.</th>
+                <th class="col-real-proj">Realizado</th>
+                <th class="col-badge">%</th>
                 ${headerExtra}
             </tr>`;
 
@@ -879,24 +930,20 @@
                 const proj = projecaoHoraria[i];
                 const anoAnt = anoAnterior[i];
 
-                // Badge Realizado vs Ano Anterior — só horas concluídas
                 let badgeReal = '<span class="dash-cell">—</span>';
                 if (isRealizado && anoAnt > 0) {
                     const pct = ((real - anoAnt) / anoAnt) * 100;
                     badgeReal = badgeGrowth(pct);
                 }
 
-                // Classe da linha
                 const rowClass = isRealizado ? 'row-done' : 'row-proj';
 
-                // Célula do filtro extra
                 let extraCell = '';
                 if (filterInfo) {
                     const fVal = filterInfo.data[i] || 0;
                     extraCell = `<td class="col-filter-val">${fVal > 0 ? fmt(fVal) : '<span class="dash-cell">—</span>'}</td>`;
                 }
 
-                // Barra de progresso visual (realizado vs anoAnterior)
                 let barHtml = '';
                 if (isRealizado && anoAnt > 0) {
                     const pct = Math.min((real / anoAnt) * 100, 150);
@@ -904,45 +951,44 @@
                     barHtml = `<div class="mini-bar-wrap"><div class="mini-bar" style="width:${Math.min(pct, 100)}%;background:${barColor}"></div></div>`;
                 }
 
+                const label = getTableLabel(i);
+
+                let cellContent = '';
+                if (isRealizado) {
+                    cellContent = `<div class="real-wrap"><strong>${fmt(real)}</strong><i class="bi bi-check-circle-fill" style="color:var(--success);font-size:0.65rem"></i></div>${barHtml}`;
+                } else {
+                    cellContent = `<span class="proj-val">${fmt(proj)}</span>`;
+                }
+
                 tbody.innerHTML += `<tr class="${rowClass}">
-                    <td class="col-hora"><span class="hora-badge">${HORARIOS[i]}</span></td>
+                    <td class="col-hora"><span class="hora-badge">${label}</span></td>
                     <td class="col-anoant">${anoAnt > 0 ? fmt(anoAnt) : '<span class="dash-cell">—</span>'}</td>
-                    <td class="col-real">
-                        ${isRealizado
-                        ? `<div class="real-wrap"><strong>${fmt(real)}</strong><i class="bi bi-check-circle-fill" style="color:var(--success);font-size:0.65rem;margin-left:4px"></i></div>${barHtml}`
-                        : '<span class="dash-cell">—</span>'}
-                    </td>
-                    <td class="col-proj">${isRealizado ? '<span class="dash-cell">—</span>' : `<span class="proj-val">${fmt(proj)}</span>`}</td>
+                    <td class="col-real-proj">${cellContent}</td>
                     <td class="col-badge">${badgeReal}</td>
                     ${extraCell}
                 </tr>`;
             }
         }
 
-        // ================== FULL UPDATE ==================
         function fullUpdate() {
             calcularProjecao();
             updateCards();
             rebuildChart();
             renderTable();
-            // Sem localStorage — sempre busca da API
         }
 
         function loadDataFromArrays(ano, sem, dia, real) {
             anoAnterior = ano.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
             semanaAnterior = sem.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
-            // Garante array completo para diaAnterior, preenchendo posições faltantes com 0
             const diaArr = (dia && dia.length > 0) ? dia : [];
             diaAnterior = Array.from({ length: EXPECTED_ROWS }, (_, i) => Number(diaArr[i]) || 0);
             realizado = real.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
             fullUpdate();
         }
 
-        // ================== API GOOGLE SHEETS ==================
         async function buscarDadosDaAPI() {
             document.getElementById('timestampApi').innerHTML = '<i class="bi bi-arrow-repeat"></i> Atualizando...';
             try {
-                // Cache-bust para garantir dados frescos sempre
                 const url = URL_API + (URL_API.includes('?') ? '&' : '?') + '_cb=' + Date.now();
                 const response = await fetch(url, { cache: 'no-store' });
                 if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -970,30 +1016,31 @@
             }
         }
 
-        // Dados de exemplo (fallback)
         function loadMockData() {
             anoAnterior = [224072.08, 27726.64, 100031.16, 138521.57, 215568.62, 199586.58, 170781.49, 101698.68, 130408.05, 183136.11, 165201.59, 124433.61, 60988.98, 46350.96, 16667.06, 17444.28, 8763.38, 4109.51];
             semanaAnterior = anoAnterior.map(v => v * 0.97);
             diaAnterior = anoAnterior.map(v => v * 0.95);
             realizado = [166791.65, 10966.89, 91099.95, 118773.8, 204295.04, 167117.6, 127122.32, 150681.47, 134825.33, 158011.86, 0, 0, 0, 0, 0, 0, 0, 0];
             fullUpdate();
-            document.getElementById('timestampApi').innerHTML =
-                '<i class="bi bi-info-circle"></i> Dados de exemplo (fallback)';
+            document.getElementById('timestampApi').innerHTML = '<i class="bi bi-info-circle"></i> Dados de exemplo (fallback)';
         }
 
-        // ================== FILTROS ==================
         function toggleFilter(fid) {
             if (activeFilters.has(fid)) activeFilters.delete(fid);
             else activeFilters.add(fid);
             document.querySelectorAll('.filter-card').forEach(card => {
-                card.classList.toggle('filter-active', activeFilters.has(card.dataset.filter));
+                if (card.dataset.filter) {
+                    card.classList.toggle('filter-active', activeFilters.has(card.dataset.filter));
+                }
             });
             rebuildChart();
             renderTable();
         }
 
         document.querySelectorAll('.filter-card').forEach(card => {
-            card.addEventListener('click', () => toggleFilter(card.dataset.filter));
+            if (card.dataset.filter) {
+                card.addEventListener('click', () => toggleFilter(card.dataset.filter));
+            }
         });
 
         document.getElementById('btnResetFiltros').addEventListener('click', () => {
@@ -1005,11 +1052,16 @@
 
         document.getElementById('btnAtualizar').addEventListener('click', buscarDadosDaAPI);
 
-        // ================== INICIALIZAÇÃO ==================
-        // Sem cache local — sempre busca da API
-        buscarDadosDaAPI();
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                rebuildChart();
+                renderTable();
+            }, 150);
+        });
 
-        // Recarregar automaticamente a cada 5 minutos
+        buscarDadosDaAPI();
         setInterval(buscarDadosDaAPI, 5 * 60 * 1000);
     </script>
 </body>
