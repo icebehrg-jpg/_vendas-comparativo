@@ -1136,12 +1136,74 @@
             realizado = real.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
             fullUpdate();
         }
-        async function buscarDadosDaAPI() {
+        // ================== CACHE ==================
+        const CACHE_KEY = 'vendas_cache';
+        const CACHE_TTL_KEY = 'vendas_cache_expiry';
+        const CACHE_INTERVAL_MS = 5 * 60 * 1000; // atualiza API a cada 5 min
+
+        function getMidnightTimestamp() {
+            const now = new Date();
+            const meia_noite = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+            return meia_noite.getTime();
+        }
+
+        function salvarCache(dados) {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify(dados));
+                localStorage.setItem(CACHE_TTL_KEY, getMidnightTimestamp().toString());
+            } catch (e) {
+                console.warn('Cache não pôde ser salvo:', e);
+            }
+        }
+
+        function lerCache() {
+            try {
+                const expiry = parseInt(localStorage.getItem(CACHE_TTL_KEY) || '0', 10);
+                if (Date.now() >= expiry) {
+                    localStorage.removeItem(CACHE_KEY);
+                    localStorage.removeItem(CACHE_TTL_KEY);
+                    return null;
+                }
+                const raw = localStorage.getItem(CACHE_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function limparCacheSeNovoDia() {
+            const expiry = parseInt(localStorage.getItem(CACHE_TTL_KEY) || '0', 10);
+            if (expiry > 0 && Date.now() >= expiry) {
+                localStorage.removeItem(CACHE_KEY);
+                localStorage.removeItem(CACHE_TTL_KEY);
+            }
+        }
+
+        // ================== API ==================
+        async function buscarDadosDaAPI({ forcarAPI = false } = {}) {
             const btnAtualizar = document.getElementById('btnAtualizar');
             const btnIcon = btnAtualizar.querySelector('i');
             btnAtualizar.disabled = true;
-            btnIcon.style.display = 'inline-block';
             btnIcon.style.animation = 'spin 0.8s linear infinite';
+
+            limparCacheSeNovoDia();
+
+            // Tenta usar cache (exceto quando forçado pelo botão)
+            if (!forcarAPI) {
+                const cache = lerCache();
+                if (cache) {
+                    loadDataFromArrays(cache.anoAnterior, cache.semanaAnterior, cache.diaAnterior || [], cache.realizado);
+                    const dataStr = cache.ultimaAtualizacao
+                        ? new Date(cache.ultimaAtualizacao).toLocaleString('pt-BR')
+                        : new Date(cache._cachedAt).toLocaleString('pt-BR');
+                    document.getElementById('timestampApi').innerHTML =
+                        `<i class="bi bi-database-check" style="color:var(--blue-main)"></i> Cache: ${dataStr}`;
+                    btnIcon.style.animation = '';
+                    btnAtualizar.disabled = false;
+                    return;
+                }
+            }
+
             document.getElementById('timestampApi').innerHTML = '<i class="bi bi-arrow-repeat"></i> Atualizando...';
             try {
                 const url = URL_API + (URL_API.includes('?') ? '&' : '?') + '_cb=' + Date.now();
@@ -1149,14 +1211,28 @@
                 if (!response.ok) throw new Error('HTTP ' + response.status);
                 const dados = await response.json();
                 if (dados.anoAnterior && dados.semanaAnterior && dados.realizado) {
+                    dados._cachedAt = Date.now();
+                    salvarCache(dados);
                     loadDataFromArrays(dados.anoAnterior, dados.semanaAnterior, dados.diaAnterior || [], dados.realizado);
-                    const dataStr = dados.ultimaAtualizacao ? new Date(dados.ultimaAtualizacao).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR');
-                    document.getElementById('timestampApi').innerHTML = `<i class="bi bi-check-circle-fill" style="color:var(--success)"></i> Atualizado: ${dataStr}`;
+                    const dataStr = dados.ultimaAtualizacao
+                        ? new Date(dados.ultimaAtualizacao).toLocaleString('pt-BR')
+                        : new Date().toLocaleString('pt-BR');
+                    document.getElementById('timestampApi').innerHTML =
+                        `<i class="bi bi-check-circle-fill" style="color:var(--success)"></i> Atualizado: ${dataStr}`;
                 } else { throw new Error('JSON inválido'); }
             } catch (erro) {
                 console.error('Erro API:', erro);
-                document.getElementById('timestampApi').innerHTML = '<i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i> Erro ao carregar. Dados de exemplo.';
-                loadMockData();
+                // Tenta usar cache mesmo expirado como último recurso
+                const cacheFallback = lerCache();
+                if (cacheFallback) {
+                    loadDataFromArrays(cacheFallback.anoAnterior, cacheFallback.semanaAnterior, cacheFallback.diaAnterior || [], cacheFallback.realizado);
+                    document.getElementById('timestampApi').innerHTML =
+                        `<i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i> Sem conexão — usando cache.`;
+                } else {
+                    document.getElementById('timestampApi').innerHTML =
+                        `<i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i> Erro ao carregar. Dados de exemplo.`;
+                    loadMockData();
+                }
             } finally {
                 btnIcon.style.animation = '';
                 btnAtualizar.disabled = false;
@@ -1179,11 +1255,14 @@
         }
         document.querySelectorAll('.filter-card').forEach(card => { if (card.dataset.filter) card.addEventListener('click', () => toggleFilter(card.dataset.filter)); });
         document.getElementById('btnResetFiltros').addEventListener('click', () => { activeFilters.clear(); document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('filter-active')); rebuildChart(); renderTable(); });
-        document.getElementById('btnAtualizar').addEventListener('click', buscarDadosDaAPI);
+        // Botão atualizar sempre força busca na API, ignorando cache
+        document.getElementById('btnAtualizar').addEventListener('click', () => buscarDadosDaAPI({ forcarAPI: true }));
         let resizeTimer;
         window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { rebuildChart(); renderTable(); }, 150); });
+        // Carga inicial usa cache se disponível
         buscarDadosDaAPI();
-        setInterval(buscarDadosDaAPI, 5 * 60 * 1000);
+        // Intervalo de 5min usa cache (não força API) — só vai à API se o cache expirou
+        setInterval(() => buscarDadosDaAPI({ forcarAPI: false }), CACHE_INTERVAL_MS);
     </script>
 </body>
 
