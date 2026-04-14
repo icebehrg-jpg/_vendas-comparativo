@@ -1496,10 +1496,8 @@
             document.getElementById('timestampApi').innerHTML = '<i class="bi bi-arrow-repeat"></i> Atualizando...';
             try {
                 const url = URL_API + (URL_API.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-                const response = await fetch(url, {
-                    cache: 'no-store',
-                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
-                });
+                // ⚠️ Removeu os headers que causam preflight
+                const response = await fetch(url, { cache: 'no-store' });
                 if (!response.ok) throw new Error('HTTP ' + response.status);
                 const dados = await response.json();
                 if (dados.dadosPorData) {

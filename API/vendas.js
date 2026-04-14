@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   // URL do seu Google Apps Script (já com o header CORS adicionado)
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvpN55hlUjJWf6Xe3vyu6RqLWIn0LDhmu3YBVoNXsjl1M3ACHKOpxwRxAzxMPMoWyt/exec';
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHgmFgWv8SLj4nIf0CEtHZxB1SiXkckimr-YtgU2Xb7s4YmVu5Xa0hlbH0DAuwDtRd/exec';
 
   try {
     const response = await fetch(GOOGLE_SCRIPT_URL + '?cb=' + Date.now(), {
