@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
+        /* ===== SEU CSS ORIGINAL (SEM ALTERAÇÕES) ===== */
         :root {
             --blue-dark: #1a3a5c;
             --blue-main: #2176c7;
@@ -78,6 +79,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         .header-brand {
@@ -123,8 +125,9 @@
 
         .header-actions {
             display: flex;
-            gap: 4px;
-            flex-wrap: nowrap;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .btn-ghost {
@@ -157,6 +160,16 @@
 
         .btn-ghost i {
             font-size: 0.85rem;
+        }
+
+        @media (max-width: 550px) {
+            .date-selector label {
+                display: none;
+            }
+
+            .date-selector {
+                padding: 4px 6px;
+            }
         }
 
         @media (max-width: 400px) {
@@ -194,7 +207,6 @@
         }
 
         /* ===== CARDS PRINCIPAIS ===== */
-        /* Desktop: 3 colunas lado a lado */
         @media (min-width: 768px) {
             .cards-main {
                 display: grid;
@@ -223,7 +235,6 @@
             }
         }
 
-        /* Mobile: layout horizontal com destaque no valor */
         @media (max-width: 767px) {
             .cards-main {
                 display: flex;
@@ -237,7 +248,6 @@
                 min-height: 64px;
             }
 
-            /* Grid de 3 colunas: label | valor | growth */
             .card-main .card-content {
                 display: grid;
                 grid-template-columns: 1fr auto 1fr;
@@ -334,7 +344,7 @@
             letter-spacing: -0.02em;
         }
 
-        /* ===== CARDS SECUNDÁRIOS - MESMO TAMANHO ===== */
+        /* ===== CARDS SECUNDÁRIOS ===== */
         .cards-secondary {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -359,7 +369,6 @@
             overflow: hidden;
         }
 
-        /* Garantir que todos tenham a mesma altura mesmo com conteúdo diferente */
         .card-sec>div:first-child {
             flex: 1;
         }
@@ -418,7 +427,6 @@
             margin-left: 4px;
         }
 
-        /* Ajuste mobile para cards secundários (continuam lado a lado) */
         @media (max-width: 700px) {
             .cards-secondary {
                 gap: 6px;
@@ -688,14 +696,12 @@
             }
         }
 
-        /* Botão desabilitado durante atualização */
         .btn-ghost:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none !important;
         }
 
-        /* Mini bar mais visível */
         .mini-bar-wrap {
             height: 3px;
             background: #eef2f7;
@@ -739,7 +745,6 @@
             color: var(--blue-dark);
         }
 
-        /* Ordem dos elementos: no desktop, gráfico antes da tabela; no mobile, gráfico antes também */
         @media (min-width: 768px) {
             .table-card {
                 order: 4;
@@ -759,6 +764,223 @@
                 order: 4;
             }
         }
+
+        /* ===== CALENDÁRIO CUSTOMIZADO ===== */
+        .cal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(10, 20, 35, 0.45);
+            backdrop-filter: blur(2px);
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: 54px 12px 0;
+        }
+
+        .cal-overlay.open {
+            display: flex;
+        }
+
+        .cal-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(26, 58, 92, 0.18);
+            width: 100%;
+            max-width: 320px;
+            overflow: hidden;
+            animation: calSlideIn 0.18s ease;
+        }
+
+        @keyframes calSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cal-month-label {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--blue-dark);
+            text-transform: capitalize;
+            letter-spacing: 0.02em;
+        }
+
+        .cal-nav {
+            background: var(--blue-ghost);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--blue-main);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.12s;
+            font-size: 0.8rem;
+        }
+
+        .cal-nav:hover {
+            background: var(--blue-pale);
+        }
+
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 8px 10px 2px;
+            gap: 2px;
+        }
+
+        .cal-weekdays span {
+            text-align: center;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 4px 10px 10px;
+            gap: 3px;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.12s;
+            border: 2px solid transparent;
+            position: relative;
+            color: var(--text-main);
+        }
+
+        .cal-day:hover:not(.cal-day-empty):not(.cal-day-no-data) {
+            background: var(--blue-pale);
+            color: var(--blue-main);
+        }
+
+        .cal-day-has-data {
+            background: var(--blue-ghost);
+        }
+
+        .cal-day-has-data::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--blue-main);
+        }
+
+        .cal-day-selected {
+            background: var(--blue-main) !important;
+            color: #fff !important;
+            border-color: var(--blue-main);
+        }
+
+        .cal-day-selected::after {
+            background: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .cal-day-no-data {
+            opacity: 0.28;
+            cursor: not-allowed;
+            font-weight: 400;
+        }
+
+        .cal-day-empty {
+            cursor: default;
+        }
+
+        .cal-day-today:not(.cal-day-selected) {
+            border-color: var(--blue-light);
+            color: var(--blue-main);
+            font-weight: 800;
+        }
+
+        .cal-footer {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            padding: 8px 14px 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .cal-legend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .cal-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .cal-dot-has {
+            background: var(--blue-main);
+        }
+
+        .cal-dot-none {
+            background: var(--border);
+        }
+
+        @media (max-width: 767px) {
+            .cal-overlay {
+                align-items: flex-end;
+                justify-content: center;
+                padding: 0;
+            }
+
+            .cal-panel {
+                max-width: 100%;
+                border-radius: 1rem 1rem 0 0;
+                animation: calSlideUp 0.2s ease;
+            }
+
+            @keyframes calSlideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
     </style>
 </head>
 
@@ -776,6 +998,10 @@
                 </div>
             </div>
             <div class="header-actions">
+                <button class="btn-ghost" id="btnCalendario" title="Selecionar data">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="btnCalendarioLabel" style="font-size:0.72rem;font-weight:700;"></span>
+                </button>
                 <button class="btn-ghost" id="btnResetFiltros" title="Limpar filtros"><i
                         class="bi bi-eraser"></i></button>
                 <button class="btn-ghost" id="btnAtualizar" title="Atualizar dados"><i
@@ -786,10 +1012,30 @@
         </div>
     </header>
 
+    <!-- CALENDÁRIO CUSTOMIZADO -->
+    <div id="calendarOverlay" class="cal-overlay" aria-hidden="true">
+        <div class="cal-panel" role="dialog" aria-label="Seletor de data">
+            <div class="cal-header">
+                <button class="cal-nav" id="calPrev" aria-label="Mês anterior"><i
+                        class="bi bi-chevron-left"></i></button>
+                <span class="cal-month-label" id="calMonthLabel"></span>
+                <button class="cal-nav" id="calNext" aria-label="Próximo mês"><i
+                        class="bi bi-chevron-right"></i></button>
+            </div>
+            <div class="cal-weekdays">
+                <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-footer">
+                <span class="cal-legend"><span class="cal-dot cal-dot-has"></span>Com dados</span>
+                <span class="cal-legend"><span class="cal-dot cal-dot-none"></span>Sem dados</span>
+            </div>
+        </div>
+    </div>
+
     <main>
         <div class="timestamp-bar" id="timestampApi">Carregando dados...</div>
 
-        <!-- CARDS PRINCIPAIS -->
         <div class="cards-main">
             <div class="card-main filter-card" data-filter="realizado" id="cardRealizado">
                 <div class="card-content">
@@ -816,7 +1062,6 @@
             </div>
         </div>
 
-        <!-- CARDS SECUNDÁRIOS - MESMO TAMANHO -->
         <div class="cards-secondary">
             <div class="card-sec filter-card" data-filter="semanaAnterior" id="cardSemanaAnt">
                 <div>
@@ -844,7 +1089,6 @@
             </div>
         </div>
 
-        <!-- TABELA -->
         <div class="table-card">
             <h6><i class="bi bi-table"></i> Detalhamento por faixa horária — Atual vs Ano Anterior</h6>
             <div class="table-responsive">
@@ -855,7 +1099,6 @@
             </div>
         </div>
 
-        <!-- GRÁFICO -->
         <div class="chart-card">
             <div class="chart-card-header">
                 <h6><i class="bi bi-graph-up-arrow"></i> Evolução por faixa horária</h6>
@@ -869,7 +1112,8 @@
         const HORARIOS = ["00:00/06:59", "07:00/07:59", "08:00/08:59", "09:00/09:59", "10:00/10:59", "11:00/11:59", "12:00/12:59", "13:00/13:59", "14:00/14:59", "15:00/15:59", "16:00/16:59", "17:00/17:59", "18:00/18:59", "19:00/19:59", "20:00/20:59", "21:00/21:59", "22:00/22:59", "23:00/23:59"];
         const HORARIOS_MOBILE = ["00 | 07", "07 | 08", "08 | 09", "09 | 10", "10 | 11", "11 | 12", "12 | 13", "13 | 14", "14 | 15", "15 | 16", "16 | 17", "17 | 18", "18 | 19", "19 | 20", "20 | 21", "21 | 22", "22 | 23", "23 | 00"];
         const EXPECTED_ROWS = 18;
-        const URL_API = 'https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMUHjhFbpnx22IjPaN3kXtSUR7ZItG1x1nofuOjRym_l2yN-f1vpyHXkAbSnhW5P71ZTPGfacEdx-vZAjr9KPavwPVmoSo8R-vZ-xvHxz49NK2-HUSXL6l0fxmDo2gmm-iLubVqjp_nTMjwhHLXx5T6m1iVGuQkHY7kekomrswp2Sjhksh1mi-PFsptMxGS59O4tFMcJK7aGVyptJII-RdPcCAMRTzxiQ6sEf69_OZwvA01kQTKgyXCGrW9YoKfIo0rbKWafhjxS9LmjYl8lDZcppgpEtQ&lib=MVV-mxIMeD1PmEZGEGHWErBcjUx3oCoSL';
+        const URL_API = 'https://script.google.com/macros/s/AKfycbxGihN8kmRn70EvIbIhS5-CAq7o6Ow0O1peNt6Ma9lnUHmo13razoDQ1RRvItHt2Zp1/exec';
+
         let currentChart = null;
         let activeFilters = new Set();
         let anoAnterior = new Array(EXPECTED_ROWS).fill(0);
@@ -882,7 +1126,11 @@
         let totalRealizadoSemMadrugada = 0;
         let totalAnoAntSemMadrugada = 0;
 
-        // Dark mode
+        // Armazenamento dos dados de todas as datas
+        let dadosCompletos = null;
+        let ultimaDataSelecionada = null;
+
+        // ================== DARK MODE ==================
         function initDarkMode() {
             const stored = localStorage.getItem('darkMode');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -914,6 +1162,7 @@
         document.getElementById('btnDarkMode').addEventListener('click', toggleDarkMode);
         initDarkMode();
 
+        // ================== UTILITÁRIOS ==================
         function isMobile() { return window.innerWidth < 768; }
         function getChartLabels() { return isMobile() ? HORARIOS_MOBILE : HORARIOS; }
         function getTableLabel(idx) { return isMobile() ? HORARIOS_MOBILE[idx] : HORARIOS[idx]; }
@@ -924,6 +1173,7 @@
             return `<span class="badge-down">▼ ${fmtPct(val)}</span>`;
         }
 
+        // ================== PROJEÇÃO ==================
         function calcularProjecao() {
             totalAnoAnt = anoAnterior.reduce((a, b) => a + (b || 0), 0);
             totalSemanaAnt = semanaAnterior.reduce((a, b) => a + (b || 0), 0);
@@ -948,14 +1198,13 @@
                 projecaoHoraria[i] = (realizado[i] > 0) ? realizado[i] : projecaoFinal * participacao[i];
         }
 
+        // ================== ATUALIZAÇÃO DOS CARDS ==================
         function updateCards() {
             document.getElementById('totalRealizado').textContent = fmt(totalRealizado);
             document.getElementById('projecaoFinal').textContent = fmt(projecaoFinal);
             document.getElementById('totalAnoAnt').textContent = fmt(totalAnoAnt);
-
             let growthProj = totalAnoAnt ? ((projecaoFinal - totalAnoAnt) / totalAnoAnt) * 100 : 0;
             document.getElementById('crescimentoProj').innerHTML = badgeGrowth(growthProj);
-
             let somaAnoAntMesmasHoras = 0;
             let horasRealizadasIdx = [];
             for (let i = 0; i < EXPECTED_ROWS; i++) {
@@ -971,20 +1220,15 @@
             } else {
                 crescElReal.innerHTML = '';
             }
-
             document.getElementById('totalSemanaAnt').textContent = fmt(totalSemanaAnt);
             document.getElementById('totalDiaAnt').textContent = fmt(totalDiaAnt);
-
             let diffSem = totalSemanaAnt ? ((projecaoFinal - totalSemanaAnt) / totalSemanaAnt) * 100 : 0;
             let diffDia = totalDiaAnt ? ((projecaoFinal - totalDiaAnt) / totalDiaAnt) * 100 : 0;
-
             document.getElementById('diffSemanaAnt').innerHTML = badgeGrowth(diffSem);
             document.getElementById('diffDiaAnt').innerHTML = badgeGrowth(diffDia);
-
             document.getElementById('refSemanaAnt').innerHTML = `Ano anterior: ${fmt(totalAnoAnt)}`;
             document.getElementById('refDiaAnt').innerHTML = `Ano anterior: ${fmt(totalAnoAnt)}`;
             document.getElementById('refSemMadrugada').innerHTML = `Ano anterior: ${fmt(totalAnoAntSemMadrugada)}`;
-
             document.getElementById('totalRealizadoSemMadrugada').textContent = totalRealizadoSemMadrugada > 0 ? fmt(totalRealizadoSemMadrugada) : '--';
             if (totalRealizadoSemMadrugada > 0 && totalAnoAntSemMadrugada > 0) {
                 let growthSemMadrugada = ((totalRealizadoSemMadrugada - totalAnoAntSemMadrugada) / totalAnoAntSemMadrugada) * 100;
@@ -994,6 +1238,7 @@
             }
         }
 
+        // ================== GRÁFICO ==================
         function getChartColors() {
             const isDark = document.body.classList.contains('dark');
             return {
@@ -1001,7 +1246,6 @@
                 tickColor: isDark ? '#9ab3cf' : '#5f7f9e',
             };
         }
-
         function rebuildChart() {
             if (currentChart) currentChart.destroy();
             const ctx = document.getElementById('salesChart').getContext('2d');
@@ -1015,7 +1259,6 @@
                 intersecaoSerie[lastRealIdx] = projecaoHoraria[lastRealIdx];
                 intersecaoSerie[lastRealIdx + 1] = projecaoHoraria[lastRealIdx + 1];
             }
-
             const allDatasets = [
                 { id: 'realizado', label: '✅ Realizado', data: realizadoSerie, borderColor: '#2176c7', backgroundColor: 'rgba(33,118,199,0.08)', borderWidth: 2.5, tension: 0.25, pointRadius: 3, pointHoverRadius: 6, fill: false },
                 { id: 'projecao', label: '📊 Projetado', data: projetadoSerie, borderColor: '#85bef0', backgroundColor: 'rgba(133,190,240,0.05)', borderWidth: 2, borderDash: [6, 5], tension: 0.25, pointRadius: 2, pointHoverRadius: 4, fill: false },
@@ -1024,7 +1267,6 @@
                 { id: 'semanaAnterior', label: '📆 Semana Anterior', data: semanaAnterior, borderColor: '#c5d8e8', borderWidth: 1.5, borderDash: [3, 4], tension: 0.2, pointRadius: 1, fill: false },
                 { id: 'diaAnterior', label: '📆 Dia Anterior', data: diaAnterior, borderColor: '#d5e5f0', borderWidth: 1.5, borderDash: [2, 4], tension: 0.2, pointRadius: 1, fill: false }
             ];
-
             allDatasets.forEach(ds => {
                 if (activeFilters.size === 0) {
                     ds.hidden = !['realizado', 'projecao', 'anoAnterior', 'diaAnterior'].includes(ds.id);
@@ -1038,7 +1280,6 @@
                     }
                 }
             });
-
             const bridgeDatasetIndex = allDatasets.findIndex(ds => ds._bridgeOnly);
             const mobile = isMobile();
             currentChart = new Chart(ctx, {
@@ -1078,20 +1319,11 @@
                     },
                     scales: {
                         x: {
-                            ticks: {
-                                font: { size: mobile ? 7 : 9 },
-                                maxRotation: 45,
-                                autoSkip: true,
-                                color: tickColor
-                            },
+                            ticks: { font: { size: mobile ? 7 : 9 }, maxRotation: 45, autoSkip: true, color: tickColor },
                             grid: { color: gridColor }
                         },
                         y: {
-                            ticks: {
-                                font: { size: mobile ? 8 : 9 },
-                                color: tickColor,
-                                callback: v => v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v
-                            },
+                            ticks: { font: { size: mobile ? 8 : 9 }, color: tickColor, callback: v => v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v },
                             grid: { color: gridColor }
                         }
                     }
@@ -1099,6 +1331,7 @@
             });
         }
 
+        // ================== TABELA ==================
         function renderTable() {
             const filterDataMap = { semanaAnterior: { label: 'Sem. Ant.', data: semanaAnterior }, diaAnterior: { label: 'Dia Ant.', data: diaAnterior } };
             const activeDataFilter = [...activeFilters].find(f => filterDataMap[f]);
@@ -1128,124 +1361,192 @@
         }
 
         function fullUpdate() { calcularProjecao(); updateCards(); rebuildChart(); renderTable(); }
-        function loadDataFromArrays(ano, sem, dia, real) {
-            anoAnterior = ano.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
-            semanaAnterior = sem.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
-            const diaArr = (dia && dia.length > 0) ? dia : [];
-            diaAnterior = Array.from({ length: EXPECTED_ROWS }, (_, i) => Number(diaArr[i]) || 0);
-            realizado = real.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
+
+        // ================== CARREGAR DADOS DE UMA DATA ESPECÍFICA ==================
+        function carregarDataSelecionada(dataKey) {
+            if (!dadosCompletos || !dadosCompletos[dataKey]) return;
+            const dadosDia = dadosCompletos[dataKey];
+            anoAnterior = dadosDia.anoAnterior.slice();
+            semanaAnterior = dadosDia.semanaAnterior.slice();
+            diaAnterior = dadosDia.diaAnterior.slice();
+            realizado = dadosDia.realizado.slice();
+            while (anoAnterior.length < EXPECTED_ROWS) anoAnterior.push(0);
+            while (semanaAnterior.length < EXPECTED_ROWS) semanaAnterior.push(0);
+            while (diaAnterior.length < EXPECTED_ROWS) diaAnterior.push(0);
+            while (realizado.length < EXPECTED_ROWS) realizado.push(0);
             fullUpdate();
-        }
-        // ================== CACHE ==================
-        const CACHE_KEY = 'vendas_cache';
-        const CACHE_TTL_KEY = 'vendas_cache_expiry';
-        const CACHE_INTERVAL_MS = 5 * 60 * 1000; // atualiza API a cada 5 min
-
-        function getMidnightTimestamp() {
-            const now = new Date();
-            const meia_noite = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
-            return meia_noite.getTime();
+            ultimaDataSelecionada = dataKey;
+            localStorage.setItem('ultimaDataSelecionada', dataKey);
         }
 
-        function salvarCache(dados) {
-            try {
-                localStorage.setItem(CACHE_KEY, JSON.stringify(dados));
-                localStorage.setItem(CACHE_TTL_KEY, getMidnightTimestamp().toString());
-            } catch (e) {
-                console.warn('Cache não pôde ser salvo:', e);
+        // ================== CALENDÁRIO CUSTOMIZADO ==================
+        let calViewYear = null;
+        let calViewMonth = null;
+        let calSelectedDate = null;
+        let datasComDados = new Set();
+
+        function abrirCalendario() {
+            const overlay = document.getElementById('calendarOverlay');
+            overlay.classList.add('open');
+            overlay.setAttribute('aria-hidden', 'false');
+            renderCalendario();
+        }
+        function fecharCalendario() {
+            const overlay = document.getElementById('calendarOverlay');
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+        function renderCalendario() {
+            const hoje = new Date();
+            if (calViewYear === null) calViewYear = hoje.getFullYear();
+            if (calViewMonth === null) calViewMonth = hoje.getMonth();
+            const labelData = new Date(calViewYear, calViewMonth, 1);
+            document.getElementById('calMonthLabel').textContent = labelData.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            const grid = document.getElementById('calGrid');
+            grid.innerHTML = '';
+            const primeiroDia = new Date(calViewYear, calViewMonth, 1).getDay();
+            const ultimoDia = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+            const hojeStr = hoje.toISOString().slice(0, 10);
+            for (let i = 0; i < primeiroDia; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'cal-day cal-day-empty';
+                grid.appendChild(empty);
             }
-        }
-
-        function lerCache() {
-            try {
-                const expiry = parseInt(localStorage.getItem(CACHE_TTL_KEY) || '0', 10);
-                if (Date.now() >= expiry) {
-                    localStorage.removeItem(CACHE_KEY);
-                    localStorage.removeItem(CACHE_TTL_KEY);
-                    return null;
+            for (let d = 1; d <= ultimoDia; d++) {
+                const mesStr = String(calViewMonth + 1).padStart(2, '0');
+                const diaStr = String(d).padStart(2, '0');
+                const dataKey = `${calViewYear}-${mesStr}-${diaStr}`;
+                const temDados = datasComDados.has(dataKey);
+                const isHoje = dataKey === hojeStr;
+                const isSelecionado = dataKey === calSelectedDate;
+                const btn = document.createElement('div');
+                btn.className = 'cal-day';
+                btn.textContent = d;
+                if (!temDados) {
+                    btn.classList.add('cal-day-no-data');
+                } else {
+                    btn.classList.add('cal-day-has-data');
+                    btn.addEventListener('click', () => {
+                        calSelectedDate = dataKey;
+                        carregarDataSelecionada(dataKey);
+                        fecharCalendario();
+                        atualizarBotaoData(dataKey);
+                    });
                 }
-                const raw = localStorage.getItem(CACHE_KEY);
-                return raw ? JSON.parse(raw) : null;
-            } catch (e) {
-                return null;
+                if (isHoje) btn.classList.add('cal-day-today');
+                if (isSelecionado) btn.classList.add('cal-day-selected');
+                grid.appendChild(btn);
+            }
+        }
+        function atualizarBotaoData(dataKey) {
+            if (!dataKey) return;
+            const [ano, mes, dia] = dataKey.split('-');
+            document.getElementById('btnCalendarioLabel').textContent = `${dia}/${mes}`;
+        }
+
+        // ================== PREENCHER DATAS DISPONÍVEIS ==================
+        function popularSeletorDatas() {
+            if (!dadosCompletos) return;
+            const datas = Object.keys(dadosCompletos).sort().reverse();
+            datasComDados = new Set(datas);
+            if (datas.length > 0) {
+                const [ano, mes] = datas[0].split('-').map(Number);
+                calViewYear = ano;
+                calViewMonth = mes - 1;
+            }
+            let dataInicial = localStorage.getItem('ultimaDataSelecionada');
+            if (!dataInicial || !dadosCompletos[dataInicial]) {
+                dataInicial = datas[0];
+            }
+            if (dataInicial) {
+                calSelectedDate = dataInicial;
+                atualizarBotaoData(dataInicial);
+                carregarDataSelecionada(dataInicial);
             }
         }
 
-        function limparCacheSeNovoDia() {
-            const expiry = parseInt(localStorage.getItem(CACHE_TTL_KEY) || '0', 10);
-            if (expiry > 0 && Date.now() >= expiry) {
-                localStorage.removeItem(CACHE_KEY);
-                localStorage.removeItem(CACHE_TTL_KEY);
-            }
-        }
+        // Navegação do calendário
+        document.getElementById('calPrev').addEventListener('click', () => {
+            calViewMonth--;
+            if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+            renderCalendario();
+        });
+        document.getElementById('calNext').addEventListener('click', () => {
+            calViewMonth++;
+            if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+            renderCalendario();
+        });
+        document.getElementById('btnCalendario').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const overlay = document.getElementById('calendarOverlay');
+            overlay.classList.contains('open') ? fecharCalendario() : abrirCalendario();
+        });
+        document.getElementById('calendarOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('calendarOverlay')) fecharCalendario();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') fecharCalendario();
+        });
 
-        // ================== API ==================
+        // ================== API (SEM CACHE) ==================
         async function buscarDadosDaAPI({ forcarAPI = false } = {}) {
             const btnAtualizar = document.getElementById('btnAtualizar');
             const btnIcon = btnAtualizar.querySelector('i');
             btnAtualizar.disabled = true;
             btnIcon.style.animation = 'spin 0.8s linear infinite';
-
-            limparCacheSeNovoDia();
-
-            // Tenta usar cache (exceto quando forçado pelo botão)
-            if (!forcarAPI) {
-                const cache = lerCache();
-                if (cache) {
-                    loadDataFromArrays(cache.anoAnterior, cache.semanaAnterior, cache.diaAnterior || [], cache.realizado);
-                    const dataStr = cache.ultimaAtualizacao
-                        ? new Date(cache.ultimaAtualizacao).toLocaleString('pt-BR')
-                        : new Date(cache._cachedAt).toLocaleString('pt-BR');
-                    document.getElementById('timestampApi').innerHTML =
-                        `<i class="bi bi-database-check" style="color:var(--blue-main)"></i> Cache: ${dataStr}`;
-                    btnIcon.style.animation = '';
-                    btnAtualizar.disabled = false;
-                    return;
-                }
-            }
-
             document.getElementById('timestampApi').innerHTML = '<i class="bi bi-arrow-repeat"></i> Atualizando...';
             try {
                 const url = URL_API + (URL_API.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-                const response = await fetch(url, { cache: 'no-store' });
+                const response = await fetch(url, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                });
                 if (!response.ok) throw new Error('HTTP ' + response.status);
                 const dados = await response.json();
-                if (dados.anoAnterior && dados.semanaAnterior && dados.realizado) {
-                    dados._cachedAt = Date.now();
-                    salvarCache(dados);
-                    loadDataFromArrays(dados.anoAnterior, dados.semanaAnterior, dados.diaAnterior || [], dados.realizado);
+                if (dados.dadosPorData) {
+                    dadosCompletos = dados.dadosPorData;
+                    popularSeletorDatas();
                     const dataStr = dados.ultimaAtualizacao
                         ? new Date(dados.ultimaAtualizacao).toLocaleString('pt-BR')
                         : new Date().toLocaleString('pt-BR');
                     document.getElementById('timestampApi').innerHTML =
                         `<i class="bi bi-check-circle-fill" style="color:var(--success)"></i> Atualizado: ${dataStr}`;
-                } else { throw new Error('JSON inválido'); }
+                } else {
+                    throw new Error('Formato de resposta inválido');
+                }
             } catch (erro) {
                 console.error('Erro API:', erro);
-                // Tenta usar cache mesmo expirado como último recurso
-                const cacheFallback = lerCache();
-                if (cacheFallback) {
-                    loadDataFromArrays(cacheFallback.anoAnterior, cacheFallback.semanaAnterior, cacheFallback.diaAnterior || [], cacheFallback.realizado);
-                    document.getElementById('timestampApi').innerHTML =
-                        `<i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i> Sem conexão — usando cache.`;
-                } else {
-                    document.getElementById('timestampApi').innerHTML =
-                        `<i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i> Erro ao carregar. Dados de exemplo.`;
-                    loadMockData();
-                }
+                document.getElementById('timestampApi').innerHTML =
+                    `<i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i> Erro ao carregar. Dados de exemplo.`;
+                loadMockData();
             } finally {
                 btnIcon.style.animation = '';
                 btnAtualizar.disabled = false;
             }
         }
+
         function loadMockData() {
-            anoAnterior = [224072.08, 27726.64, 100031.16, 138521.57, 215568.62, 199586.58, 170781.49, 101698.68, 130408.05, 183136.11, 165201.59, 124433.61, 60988.98, 46350.96, 16667.06, 17444.28, 8763.38, 4109.51];
-            semanaAnterior = anoAnterior.map(v => v * 0.97);
-            diaAnterior = anoAnterior.map(v => v * 0.95);
-            realizado = [166791.65, 10966.89, 91099.95, 118773.8, 204295.04, 167117.6, 127122.32, 150681.47, 134825.33, 158011.86, 0, 0, 0, 0, 0, 0, 0, 0];
-            fullUpdate();
+            // Fallback com dados da planilha (13/04 e 14/04)
+            const mock = {
+                "2026-04-13": {
+                    anoAnterior: [10739.57, 15922.66, 77547.77, 128699.05, 204708.83, 182934.72, 154259.76, 159207.73, 154911.03, 188729.45, 203811.92, 177470.75, 88439.18, 44186.48, 32735.78, 26484.74, 18752.41, 8117.14],
+                    semanaAnterior: [11119.21, 12989.63, 77790.09, 139135.29, 175548.44, 182645.46, 159681.8, 137868.52, 133588.05, 177914.46, 168571.55, 132489.66, 65574.89, 34879.39, 22956.48, 12085.53, 11689.57, 6793.23],
+                    diaAnterior: [9214.07, 2157.69, 4390.8, 14083.96, 25646.49, 25227.69, 27383.86, 54006.43, 55352.52, 39108.06, 33238.08, 26224.08, 30658.39, 35912.45, 20800.27, 11131.37, 8825.53, 4961.79],
+                    realizado: [10285.66, 13259.54, 78624.57, 156191.48, 226992.19, 189968.22, 169461.8, 100823.62, 25483.29, 119990.24, 240966.56, 116155.96, 61365.38, 31978.46, 34693.04, 32991.06, 12164.32, 13292.58]
+                },
+                "2026-04-14": {
+                    anoAnterior: [170176.48, 53592.16, 94902.13, 134404.69, 187297.92, 202306.65, 136942.25, 121408.4, 158054.08, 164874.1, 170609.29, 196747.72, 79617.94, 45744.07, 32031.55, 25196.2, 14859.2, 10306.81],
+                    semanaAnterior: [129207.36, 48963.65, 56455.54, 109797.25, 232766.87, 216377.6, 167081.83, 151717.87, 181419.92, 199333.6, 202592.42, 140922.95, 74449.7, 38821.01, 31852.5, 25351.3, 21003.25, 7135.79],
+                    diaAnterior: [10285.66, 13259.54, 78624.57, 156191.48, 226992.19, 189968.22, 169461.8, 100823.62, 25483.29, 119990.24, 240966.56, 116155.96, 61365.38, 31978.46, 34693.04, 32991.06, 12164.32, 13292.58],
+                    realizado: [169340.5, 10353.82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            };
+            dadosCompletos = mock;
+            popularSeletorDatas();
             document.getElementById('timestampApi').innerHTML = '<i class="bi bi-info-circle"></i> Dados de exemplo (fallback)';
         }
+
+        // ================== FILTROS ==================
         function toggleFilter(fid) {
             if (activeFilters.has(fid)) activeFilters.delete(fid);
             else activeFilters.add(fid);
@@ -1255,14 +1556,12 @@
         }
         document.querySelectorAll('.filter-card').forEach(card => { if (card.dataset.filter) card.addEventListener('click', () => toggleFilter(card.dataset.filter)); });
         document.getElementById('btnResetFiltros').addEventListener('click', () => { activeFilters.clear(); document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('filter-active')); rebuildChart(); renderTable(); });
-        // Botão atualizar sempre força busca na API, ignorando cache
         document.getElementById('btnAtualizar').addEventListener('click', () => buscarDadosDaAPI({ forcarAPI: true }));
+
+        // ================== INICIALIZAÇÃO ==================
         let resizeTimer;
         window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { rebuildChart(); renderTable(); }, 150); });
-        // Carga inicial usa cache se disponível
-        buscarDadosDaAPI();
-        // Intervalo de 5min usa cache (não força API) — só vai à API se o cache expirou
-        setInterval(() => buscarDadosDaAPI({ forcarAPI: false }), CACHE_INTERVAL_MS);
+        buscarDadosDaAPI({ forcarAPI: false });
     </script>
 </body>
 
