@@ -1112,8 +1112,7 @@
         const HORARIOS = ["00:00/06:59", "07:00/07:59", "08:00/08:59", "09:00/09:59", "10:00/10:59", "11:00/11:59", "12:00/12:59", "13:00/13:59", "14:00/14:59", "15:00/15:59", "16:00/16:59", "17:00/17:59", "18:00/18:59", "19:00/19:59", "20:00/20:59", "21:00/21:59", "22:00/22:59", "23:00/23:59"];
         const HORARIOS_MOBILE = ["00 | 07", "07 | 08", "08 | 09", "09 | 10", "10 | 11", "11 | 12", "12 | 13", "13 | 14", "14 | 15", "15 | 16", "16 | 17", "17 | 18", "18 | 19", "19 | 20", "20 | 21", "21 | 22", "22 | 23", "23 | 00"];
         const EXPECTED_ROWS = 18;
-        const URL_API = 'https://script.google.com/macros/s/AKfycbxvpN55hlUjJWf6Xe3vyu6RqLWIn0LDhmu3YBVoNXsjl1M3ACHKOpxwRxAzxMPMoWyt/exec';
-
+        const URL_API = '/api/vendas';
         let currentChart = null;
         let activeFilters = new Set();
         let anoAnterior = new Array(EXPECTED_ROWS).fill(0);
