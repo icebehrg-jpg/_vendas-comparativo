@@ -5,16 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Dashboard de Vendas · Kalunga</title>
-    <meta name="description"
-        content="Acompanhamento diário de vendas com comparativo por faixa horária, projeção e histórico.">
     <link rel="icon" type="image/png" sizes="32x32" href="https://static.kalunga.com.br/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://static.kalunga.com.br/favicon-16x16.png">
-    <link rel="shortcut icon" href="https://static.kalunga.com.br/favicon-32x32.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
+        /* ===== SEU CSS ORIGINAL (COMPLETO) ===== */
         :root {
             --blue-dark: #1a3a5c;
             --blue-main: #2176c7;
@@ -28,8 +24,13 @@
             --border: #dce5f0;
             --bg: #f0f4f8;
             --white: #ffffff;
-            --card-shadow: 0 2px 8px rgba(26, 58, 92, 0.06);
-            --card-radius: 0.875rem;
+            --card-shadow: 0 2px 8px rgba(26, 58, 92, .06);
+            --card-radius: .875rem;
+            /* Tokens de suporte para herança */
+            --row-done-bg: #ffffff;
+            --row-proj-bg: #fafbfd;
+            --mini-bar-bg: #eef2f7;
+            --table-border: #f0f3f8;
         }
 
         body.dark {
@@ -45,7 +46,11 @@
             --border: #2c3e4e;
             --bg: #121826;
             --white: #1e2936;
-            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+            --row-done-bg: #1e2936;
+            --row-proj-bg: #1a222c;
+            --mini-bar-bg: #2a3a4c;
+            --table-border: #2c3e4e;
         }
 
         * {
@@ -54,77 +59,120 @@
 
         body {
             background: var(--bg);
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             color: var(--text-main);
             margin: 0;
-            transition: background 0.2s, color 0.2s;
+            transition: background .2s, color .2s;
         }
 
-        /* ===== HEADER ===== */
+        /* ===== HEADER — mobile-first ===== */
         .dashboard-header {
             background: var(--white);
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 6px rgba(26, 58, 92, 0.06);
+            box-shadow: 0 1px 6px rgba(26, 58, 92, .06);
         }
 
         .dashboard-header .inner {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 6px 12px;
+            /* Mobile: linha única, brand à esquerda, ações à direita */
+            padding: 0 00px;
+            height: 52px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
+            gap: 0px;
         }
 
         .header-brand {
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 0px;
             flex-shrink: 0;
+            min-width: 0;
         }
 
         .header-brand-icon {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
             background: var(--blue-main);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 0.95rem;
-            flex-shrink: 0;
+            font-size: .95rem;
         }
 
         .header-brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .header-brand-title {
-            font-size: 0.8rem;
+            font-size: .8rem;
             font-weight: 800;
             color: var(--blue-dark);
-            letter-spacing: 0.02em;
+            letter-spacing: .02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .header-brand-sub {
-            font-size: 0.6rem;
+            font-size: .58rem;
             color: var(--text-muted);
             font-weight: 500;
-            letter-spacing: 0.03em;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
+        /* ── Grupo de ações ── */
         .header-actions {
             display: flex;
-            gap: 4px;
-            flex-wrap: nowrap;
+            align-items: center;
+            gap: 70px;
+            flex-shrink: 0;
+        }
+
+        /* Grupo de navegação de data: chevron + botão calendário + chevron */
+        .header-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: var(--blue-ghost);
+            border: 1px solid var(--blue-pale);
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .header-nav-group .btn-ghost {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0 8px;
+            min-height: 36px;
+        }
+
+        .header-nav-group .btn-ghost:hover {
+            background: var(--blue-pale);
+        }
+
+        .header-nav-group #btnCalendario {
+            border-left: 1px solid var(--blue-pale);
+            border-right: 1px solid var(--blue-pale);
+            padding: 0 10px;
+        }
+
+        /* Grupo de utilidades: reset filtros + atualizar + dark */
+        .header-util-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
         }
 
         .btn-ghost {
@@ -132,18 +180,21 @@
             color: var(--blue-main);
             border: 1px solid var(--blue-pale);
             border-radius: 30px;
-            padding: 6px 10px;
-            font-size: 0.75rem;
+            padding: 0 11px;
+            font-size: .75rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all .15s;
             white-space: nowrap;
-            min-width: 36px;
             min-height: 36px;
+            min-width: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
+            /* área de toque mínima confortável */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-ghost:hover {
@@ -152,20 +203,357 @@
         }
 
         .btn-ghost:active {
-            transform: translateY(0);
+            transform: scale(.96);
+        }
+
+        .btn-ghost:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-ghost:focus-visible,
+        .cal-nav:focus-visible {
+            outline: 2px solid var(--blue-main);
+            outline-offset: 2px;
         }
 
         .btn-ghost i {
-            font-size: 0.85rem;
+            font-size: .85rem;
+            line-height: 1;
         }
 
-        @media (max-width: 400px) {
-            .header-brand-text {
+        #btnCalendario {
+            font-weight: 700;
+            gap: 5px;
+        }
+
+        #calDateLabel {
+            color: var(--blue-dark);
+            font-size: .75rem;
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Botão "Limpar" seleção — compacto no mobile */
+        #btnClearSelection {
+            font-size: .7rem;
+            padding: 0 8px;
+        }
+
+        /* Desktop: mais espaço */
+        @media(min-width: 768px) {
+            .dashboard-header .inner {
+                padding: 0 16px;
+                height: 56px;
+                gap: 10px;
+            }
+
+            .header-actions {
+                gap: 6px;
+            }
+
+            .header-nav-group .btn-ghost {
+                padding: 0 10px;
+            }
+
+            #calDateLabel {
+                max-width: 120px;
+            }
+        }
+
+        /* Telas muito pequenas: esconde sub-título da marca */
+        @media(max-width: 380px) {
+            .header-brand-sub {
+                display: none;
+            }
+
+            #calDateLabel {
+                max-width: 72px;
+            }
+        }
+
+        /* ===== CALENDÁRIO — mobile-first (bottom sheet) ===== */
+        .cal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(10, 20, 35, .5);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            /* Mobile: ancora na parte inferior */
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .cal-overlay.open {
+            display: flex;
+        }
+
+        .cal-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            /* Bottom sheet com cantos superiores arredondados */
+            border-radius: 1.25rem 1.25rem 0 0;
+            box-shadow: 0 -4px 32px rgba(26, 58, 92, .18);
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+            animation: calSlideUp .22s cubic-bezier(.32, .72, 0, 1);
+            /* Safe area para iPhones com home indicator */
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        /* Handle visual do bottom sheet */
+        .cal-panel::before {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            margin: 10px auto 0;
+        }
+
+        @keyframes calSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cal-month-label {
+            font-size: .9rem;
+            font-weight: 800;
+            color: var(--blue-dark);
+            text-transform: capitalize;
+        }
+
+        .cal-nav {
+            background: var(--blue-ghost);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--blue-main);
+            /* Área de toque confortável no mobile */
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background .12s;
+            font-size: .9rem;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cal-nav:hover {
+            background: var(--blue-pale);
+        }
+
+        .cal-nav:active {
+            transform: scale(.93);
+        }
+
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 10px 12px 4px;
+            gap: 2px;
+        }
+
+        .cal-weekdays span {
+            text-align: center;
+            font-size: .65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 4px 12px 12px;
+            gap: 4px;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: .85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .12s;
+            border: 2px solid transparent;
+            position: relative;
+            color: var(--text-main);
+            /* Área de toque generosa */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cal-day:hover:not(.cal-empty):not(.cal-no-data) {
+            background: var(--blue-pale);
+            color: var(--blue-main);
+        }
+
+        .cal-day:active:not(.cal-empty):not(.cal-no-data) {
+            transform: scale(.9);
+        }
+
+        .cal-has-data {
+            background: var(--blue-ghost);
+        }
+
+        .cal-has-data::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--blue-main);
+        }
+
+        .cal-selected {
+            background: var(--blue-main) !important;
+            color: #fff !important;
+            border-color: var(--blue-main);
+        }
+
+        .cal-selected::after {
+            background: rgba(255, 255, 255, .7) !important;
+        }
+
+        .cal-no-data {
+            opacity: .28;
+            cursor: not-allowed;
+            font-weight: 400;
+        }
+
+        .cal-empty {
+            cursor: default;
+        }
+
+        .cal-today:not(.cal-selected) {
+            border-color: var(--blue-light);
+            color: var(--blue-main);
+            font-weight: 800;
+        }
+
+        .cal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 8px 16px 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .cal-legend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .62rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* No mobile, "long press" no lugar de Ctrl+clique — ajusta legenda */
+        .cal-legend-multi-desktop {
+            display: none;
+        }
+
+        .cal-legend-multi-mobile {
+            display: flex;
+        }
+
+        .cal-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Desktop: painel flutuante no canto superior direito */
+        @media(min-width: 768px) {
+            .cal-overlay {
+                align-items: flex-start;
+                justify-content: flex-end;
+                padding: 58px 16px 0;
+            }
+
+            .cal-panel {
+                border-radius: 1rem;
+                max-width: 320px;
+                box-shadow: 0 8px 32px rgba(26, 58, 92, .18);
+                padding-bottom: 0;
+                animation: calIn .18s ease;
+            }
+
+            .cal-panel::before {
+                display: none;
+            }
+
+            .cal-legend-multi-desktop {
+                display: flex;
+            }
+
+            .cal-legend-multi-mobile {
                 display: none;
             }
         }
 
-        /* ===== MAIN ===== */
+        @keyframes calIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Telas muito pequenas: calendário mais compacto */
+        @media(max-width: 380px) {
+            .cal-grid {
+                gap: 2px;
+                padding: 4px 8px 10px;
+            }
+
+            .cal-weekdays {
+                padding: 8px 8px 2px;
+            }
+
+            .cal-day {
+                font-size: .78rem;
+            }
+        }
+
+        /* MAIN */
         main {
             max-width: 1400px;
             margin: 0 auto;
@@ -179,23 +567,16 @@
             align-items: center;
             justify-content: flex-end;
             gap: 5px;
-            font-size: 0.68rem;
+            font-size: .68rem;
             color: var(--text-muted);
             margin-bottom: 8px;
             padding: 4px 10px;
             background: var(--blue-ghost);
             border-radius: 20px;
             border: 1px solid var(--border);
-            transition: color 0.2s;
         }
 
-        .timestamp-bar i {
-            font-size: 0.7rem;
-        }
-
-        /* ===== CARDS PRINCIPAIS ===== */
-        /* Desktop: 3 colunas lado a lado */
-        @media (min-width: 768px) {
+        @media(min-width:768px) {
             .cards-main {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
@@ -209,7 +590,7 @@
             }
 
             .card-label {
-                font-size: 0.7rem;
+                font-size: .7rem;
                 margin-bottom: 5px;
             }
 
@@ -219,12 +600,11 @@
 
             .card-growth {
                 margin-top: 5px;
-                font-size: 0.68rem;
+                font-size: .68rem;
             }
         }
 
-        /* Mobile: layout horizontal com destaque no valor */
-        @media (max-width: 767px) {
+        @media(max-width:767px) {
             .cards-main {
                 display: flex;
                 flex-direction: column;
@@ -237,7 +617,6 @@
                 min-height: 64px;
             }
 
-            /* Grid de 3 colunas: label | valor | growth */
             .card-main .card-content {
                 display: grid;
                 grid-template-columns: 1fr auto 1fr;
@@ -247,7 +626,7 @@
             }
 
             .card-label {
-                font-size: 0.65rem;
+                font-size: .65rem;
                 justify-self: start;
                 margin: 0;
             }
@@ -259,10 +638,9 @@
             }
 
             .card-growth {
-                font-size: 0.62rem;
+                font-size: .62rem;
                 justify-self: end;
                 white-space: nowrap;
-                margin-left: 0;
             }
         }
 
@@ -272,7 +650,7 @@
             box-shadow: var(--card-shadow);
             border: 2px solid transparent;
             cursor: pointer;
-            transition: all 0.18s;
+            transition: all .18s;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -291,7 +669,7 @@
             width: 3px;
             background: var(--blue-main);
             opacity: 0;
-            transition: opacity 0.18s;
+            transition: opacity .18s;
         }
 
         .card-main:hover::before,
@@ -301,16 +679,12 @@
 
         .card-main:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(26, 58, 92, 0.13);
-        }
-
-        .card-main:active {
-            transform: translateY(0);
+            box-shadow: 0 6px 18px rgba(26, 58, 92, .13);
         }
 
         .card-main.filter-active {
             border-color: var(--blue-main);
-            background: #eaf3fd;
+            background: var(--blue-pale);
         }
 
         body.dark .card-main.filter-active {
@@ -320,7 +694,7 @@
         .card-label {
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: .05em;
             color: var(--text-muted);
             display: flex;
             align-items: center;
@@ -331,10 +705,9 @@
             font-weight: 800;
             color: var(--blue-dark);
             line-height: 1.1;
-            letter-spacing: -0.02em;
+            letter-spacing: -.02em;
         }
 
-        /* ===== CARDS SECUNDÁRIOS - MESMO TAMANHO ===== */
         .cards-secondary {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -351,15 +724,13 @@
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            transition: all 0.15s;
-            opacity: 0.9;
+            transition: all .15s;
+            opacity: .9;
             min-height: 72px;
-            width: 100%;
             position: relative;
             overflow: hidden;
         }
 
-        /* Garantir que todos tenham a mesma altura mesmo com conteúdo diferente */
         .card-sec>div:first-child {
             flex: 1;
         }
@@ -368,16 +739,12 @@
             background: var(--blue-ghost);
             opacity: 1;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(26, 58, 92, 0.09);
-        }
-
-        .card-sec:active {
-            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(26, 58, 92, .09);
         }
 
         .card-sec.filter-active {
             border-color: var(--blue-main);
-            background: #eaf3fd;
+            background: var(--blue-pale);
             opacity: 1;
         }
 
@@ -386,10 +753,10 @@
         }
 
         .sec-label {
-            font-size: 0.6rem;
+            font-size: .6rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: .06em;
             color: var(--text-muted);
             margin-bottom: 3px;
             display: flex;
@@ -398,14 +765,14 @@
         }
 
         .sec-value {
-            font-size: 0.95rem;
+            font-size: .95rem;
             font-weight: 800;
             color: var(--blue-dark);
-            letter-spacing: -0.01em;
+            letter-spacing: -.01em;
         }
 
         .sec-ref {
-            font-size: 0.55rem;
+            font-size: .55rem;
             color: var(--text-muted);
             margin-top: 3px;
             display: block;
@@ -413,13 +780,12 @@
 
         .sec-right {
             text-align: right;
-            font-size: 0.7rem;
+            font-size: .7rem;
             white-space: nowrap;
             margin-left: 4px;
         }
 
-        /* Ajuste mobile para cards secundários (continuam lado a lado) */
-        @media (max-width: 700px) {
+        @media(max-width:700px) {
             .cards-secondary {
                 gap: 6px;
             }
@@ -428,21 +794,15 @@
                 padding: 8px 6px;
                 flex-direction: column;
                 align-items: flex-start;
-                justify-content: center;
-                text-align: left;
                 min-height: 68px;
             }
 
             .sec-label {
-                font-size: 0.55rem;
+                font-size: .55rem;
             }
 
             .sec-value {
-                font-size: 0.88rem;
-            }
-
-            .sec-ref {
-                font-size: 0.5rem;
+                font-size: .88rem;
             }
 
             .sec-right {
@@ -453,13 +813,12 @@
             }
         }
 
-        /* ===== BADGES ===== */
         .badge-up,
         .badge-down {
             display: inline-flex;
             align-items: center;
             gap: 2px;
-            font-size: 0.65rem;
+            font-size: .65rem;
             font-weight: 700;
             padding: 2px 6px;
             border-radius: 20px;
@@ -467,24 +826,23 @@
         }
 
         .badge-up {
-            background: rgba(30, 140, 90, 0.13);
+            background: rgba(30, 140, 90, .13);
             color: var(--success);
         }
 
         .badge-down {
-            background: rgba(192, 57, 43, 0.13);
+            background: rgba(192, 57, 43, .13);
             color: var(--danger);
         }
 
         body.dark .badge-up {
-            background: rgba(46, 204, 113, 0.15);
+            background: rgba(46, 204, 113, .15);
         }
 
         body.dark .badge-down {
-            background: rgba(230, 126, 34, 0.15);
+            background: rgba(230, 126, 34, .15);
         }
 
-        /* ===== GRÁFICO ===== */
         .chart-card {
             background: var(--white);
             border-radius: var(--card-radius);
@@ -494,15 +852,11 @@
             border: 1px solid var(--border);
         }
 
-        .chart-card-header {
-            margin-bottom: 6px;
-        }
-
-        .chart-card-header h6 {
-            font-size: 0.78rem;
+        .chart-card h6 {
+            font-size: .78rem;
             font-weight: 700;
             color: var(--blue-dark);
-            margin: 0;
+            margin: 0 0 6px;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -513,17 +867,12 @@
             width: 100%;
         }
 
-        @media (max-width: 767px) {
-            .chart-card {
-                padding: 8px 6px;
-            }
-
+        @media(max-width:767px) {
             .chart-card canvas {
                 max-height: 220px;
             }
         }
 
-        /* ===== TABELA ===== */
         .table-card {
             background: var(--white);
             border-radius: var(--card-radius);
@@ -534,7 +883,7 @@
         }
 
         .table-card h6 {
-            font-size: 0.78rem;
+            font-size: .78rem;
             font-weight: 700;
             color: var(--blue-dark);
             margin-bottom: 10px;
@@ -545,19 +894,19 @@
 
         .table-responsive {
             overflow-x: auto;
-            border-radius: 0.5rem;
+            border-radius: .5rem;
             -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.75rem;
+            font-size: .75rem;
         }
 
-        @media (max-width: 480px) {
+        @media(max-width:480px) {
             table {
-                font-size: 0.65rem;
+                font-size: .65rem;
             }
 
             thead th,
@@ -565,16 +914,8 @@
                 padding: 2px 4px;
             }
 
-            .col-hora {
-                width: 65px;
-            }
-
-            .col-badge {
-                width: 55px;
-            }
-
             .hora-badge {
-                font-size: 0.6rem;
+                font-size: .6rem;
                 padding: 1px 3px;
             }
         }
@@ -585,21 +926,21 @@
 
         thead th {
             padding: 7px 6px;
-            font-size: 0.65rem;
+            font-size: .65rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: .05em;
             color: var(--text-muted);
             border-bottom: 2px solid var(--border);
             white-space: nowrap;
         }
 
         tbody tr {
-            border-bottom: 1px solid #f0f3f8;
+            border-bottom: 1px solid var(--table-border);
         }
 
         body.dark tbody tr {
-            border-bottom-color: #2c3e4e;
+            border-bottom-color: var(--table-border);
         }
 
         tbody tr:hover {
@@ -637,24 +978,19 @@
             text-align: center;
         }
 
-        .col-filter th {
-            color: var(--text-muted) !important;
-            font-style: italic;
-        }
-
         .col-filter-val {
             text-align: right;
             color: var(--text-muted);
-            font-size: 0.7rem;
+            font-size: .7rem;
             font-style: italic;
         }
 
         tr.row-done {
-            background: #fff;
+            background: var(--row-done-bg);
         }
 
         body.dark tr.row-done {
-            background: var(--white);
+            background: var(--row-done-bg);
         }
 
         tr.row-done:hover {
@@ -662,11 +998,11 @@
         }
 
         tr.row-proj {
-            background: #fafbfd;
+            background: var(--row-proj-bg);
         }
 
         body.dark tr.row-proj {
-            background: #1a222c;
+            background: var(--row-proj-bg);
         }
 
         tr.row-proj td {
@@ -688,30 +1024,22 @@
             }
         }
 
-        /* Botão desabilitado durante atualização */
-        .btn-ghost:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* Mini bar mais visível */
         .mini-bar-wrap {
             height: 3px;
-            background: #eef2f7;
+            background: var(--mini-bar-bg);
             border-radius: 2px;
             margin-top: 4px;
             overflow: hidden;
         }
 
         body.dark .mini-bar-wrap {
-            background: #2a3a4c;
+            background: var(--mini-bar-bg);
         }
 
         .mini-bar {
             height: 100%;
             border-radius: 2px;
-            transition: width 0.4s ease;
+            transition: width .4s ease;
         }
 
         .real-wrap {
@@ -728,7 +1056,7 @@
 
         .dash-cell {
             color: var(--text-muted);
-            font-size: 0.7rem;
+            font-size: .7rem;
         }
 
         tbody td.col-anoant {
@@ -739,8 +1067,7 @@
             color: var(--blue-dark);
         }
 
-        /* Ordem dos elementos: no desktop, gráfico antes da tabela; no mobile, gráfico antes também */
-        @media (min-width: 768px) {
+        @media(min-width:768px) {
             .table-card {
                 order: 4;
             }
@@ -750,13 +1077,156 @@
             }
         }
 
-        @media (max-width: 767px) {
+        @media(max-width:767px) {
             .table-card {
                 order: 3;
             }
 
             .chart-card {
                 order: 4;
+            }
+        }
+
+        .card-growth {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .spinner-sm {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(33, 118, 199, 0.2);
+            border-top-color: var(--blue-main);
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            display: inline-block;
+        }
+
+        /* ===== AJUSTES EXCLUSIVOS PARA MOBILE (≤ 768px) ===== */
+        @media (max-width: 768px) {
+            .dashboard-header .inner {
+                padding: 0 6px !important;
+                height: 48px !important;
+                gap: 4px !important;
+            }
+
+            .header-brand-icon {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: .85rem !important;
+            }
+
+            .header-brand-title {
+                font-size: .75rem !important;
+            }
+
+            .header-brand-sub {
+                font-size: .55rem !important;
+            }
+
+            .header-actions {
+                gap: 4px !important;
+            }
+
+            .btn-ghost {
+                padding: 0 8px !important;
+                min-height: 34px !important;
+                min-width: 32px !important;
+                font-size: .7rem !important;
+            }
+
+            .btn-ghost i {
+                font-size: .8rem !important;
+            }
+
+            .header-nav-group .btn-ghost {
+                padding: 0 6px !important;
+                min-height: 34px !important;
+            }
+
+            .header-nav-group #btnCalendario {
+                padding: 0 8px !important;
+            }
+
+            #calDateLabel {
+                max-width: 80px !important;
+                font-size: .7rem !important;
+            }
+
+            #btnClearSelection {
+                font-size: .65rem !important;
+                padding: 0 6px !important;
+            }
+        }
+
+        /* Ajuste adicional para telas muito pequenas (ex: iPhone SE) */
+        @media (max-width: 450px) {
+            .header-brand-sub {
+                display: none !important;
+            }
+
+            #calDateLabel {
+                max-width: 70px !important;
+            }
+
+            .btn-ghost {
+                padding: 0 6px !important;
+                min-width: 30px !important;
+            }
+
+            .header-nav-group .btn-ghost {
+                padding: 0 5px !important;
+            }
+
+            .header-nav-group #btnCalendario {
+                padding: 0 6px !important;
+            }
+        }
+
+        /* Alinhamento lateral igual ao do header no mobile */
+        @media (max-width: 768px) {
+            main {
+                padding-left: 6px !important;
+                padding-right: 6px !important;
+            }
+        }
+
+        /* ===== ALINHAMENTO LATERAL UNIFORME NO MOBILE ===== */
+        @media (max-width: 768px) {
+
+            /* Header já tem padding 0 6px (ajuste anterior) */
+            .dashboard-header .inner {
+                padding-left: 6px !important;
+                padding-right: 6px !important;
+            }
+
+            /* Conteúdo principal com mesmo padding lateral */
+            main {
+                padding-left: 6px !important;
+                padding-right: 6px !important;
+            }
+
+            /* Remove qualquer padding/margin extra que possa desalinhar cards e tabela */
+            .cards-main,
+            .cards-secondary,
+            .chart-card,
+            .table-card {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                width: 100% !important;
+            }
+
+            /* Se algum card interno tiver padding extra, mantém o alinhamento */
+            .card-main,
+            .card-sec {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
             }
         }
     </style>
@@ -767,31 +1237,79 @@
     <header class="dashboard-header">
         <div class="inner">
             <div class="header-brand">
-                <div class="header-brand-icon">
-                    <i class="bi bi-bar-chart-line-fill"></i>
-                </div>
-                <div class="header-brand-text">
-                    <span class="header-brand-title">Vendas Diário</span>
-                    <span class="header-brand-sub">Comparativo</span>
-                </div>
+                <div class="header-brand-icon"><i class="bi bi-bar-chart-line-fill"></i></div>
+                <!-- <div class="header-brand-text">
+                    <div class="header-brand-title">Vendas Diário</div>
+                    <div class="header-brand-sub">Comparativo por dia</div>
+                </div> -->
             </div>
             <div class="header-actions">
-                <button class="btn-ghost" id="btnResetFiltros" title="Limpar filtros"><i
-                        class="bi bi-eraser"></i></button>
-                <button class="btn-ghost" id="btnAtualizar" title="Atualizar dados"><i
-                        class="bi bi-arrow-repeat"></i></button>
-                <button class="btn-ghost" id="btnDarkMode" title="Alternar modo noturno"><i class="bi bi-moon-stars"
-                        id="darkModeIcon"></i></button>
+                <!-- Navegação de data agrupada -->
+                <div class="header-nav-group">
+                    <button class="btn-ghost" id="btnDiaAnt" title="Dia anterior" disabled>
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button class="btn-ghost" id="btnCalendario" title="Selecionar data">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="calDateLabel">--/--/----</span>
+                    </button>
+                    <button class="btn-ghost" id="btnDiaProx" title="Próximo dia" disabled>
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+                <!-- Botão Limpar seleção múltipla -->
+                <button class="btn-ghost" id="btnClearSelection" title="Limpar seleção múltipla" style="display: none;">
+                    <i class="bi bi-x-circle"></i>
+                </button>
+                <!-- Utilidades -->
+                <div class="header-util-group">
+                    <button class="btn-ghost" id="btnResetFiltros" title="Limpar filtros">
+                        <i class="bi bi-eraser"></i>
+                    </button>
+                    <button class="btn-ghost" id="btnAtualizar" title="Atualizar dados">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </button>
+                    <button class="btn-ghost" id="btnDarkMode" title="Modo noturno">
+                        <i class="bi bi-moon-stars" id="darkModeIcon"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
+    <div id="calendarOverlay" class="cal-overlay" aria-hidden="true">
+        <div class="cal-panel" role="dialog" aria-label="Seletor de data">
+            <div class="cal-header">
+                <button class="cal-nav" id="calPrev"><i class="bi bi-chevron-left"></i></button>
+                <span class="cal-month-label" id="calMonthLabel"></span>
+                <button class="cal-nav" id="calNext"><i class="bi bi-chevron-right"></i></button>
+            </div>
+            <div class="cal-weekdays">
+                <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-footer">
+                <span class="cal-legend">
+                    <span class="cal-dot" style="background:var(--blue-main)"></span>Com dados
+                </span>
+                <span class="cal-legend">
+                    <span class="cal-dot" style="background:var(--border)"></span>Sem dados
+                </span>
+                <span class="cal-legend cal-legend-multi-desktop">
+                    <span class="cal-dot" style="background:var(--success)"></span>Selecionado (Ctrl+clique)
+                </span>
+                <span class="cal-legend cal-legend-multi-mobile">
+                    <span class="cal-dot" style="background:var(--success)"></span>Selecionado (toque longo)
+                </span>
+            </div>
+        </div>
+    </div>
+
     <main>
         <div class="timestamp-bar" id="timestampApi">Carregando dados...</div>
 
-        <!-- CARDS PRINCIPAIS -->
         <div class="cards-main">
-            <div class="card-main filter-card" data-filter="realizado" id="cardRealizado">
+            <div class="card-main filter-card" data-filter="realizado">
                 <div class="card-content">
                     <div class="card-label"><i class="bi bi-check-circle-fill" style="color:#1e8c5a"></i> Realizado
                     </div>
@@ -799,7 +1317,7 @@
                     <div class="card-growth" id="crescimentoReal"></div>
                 </div>
             </div>
-            <div class="card-main filter-card" data-filter="projecao" id="cardProjecao">
+            <div class="card-main filter-card" data-filter="projecao">
                 <div class="card-content">
                     <div class="card-label"><i class="bi bi-graph-up" style="color:var(--blue-main)"></i> Projetado
                     </div>
@@ -807,7 +1325,7 @@
                     <div class="card-growth" id="crescimentoProj"></div>
                 </div>
             </div>
-            <div class="card-main filter-card" data-filter="anoAnterior" id="cardAnoAnt">
+            <div class="card-main filter-card" data-filter="anoAnterior">
                 <div class="card-content">
                     <div class="card-label"><i class="bi bi-calendar3" style="color:var(--text-muted)"></i> Ano Anterior
                     </div>
@@ -816,9 +1334,8 @@
             </div>
         </div>
 
-        <!-- CARDS SECUNDÁRIOS - MESMO TAMANHO -->
         <div class="cards-secondary">
-            <div class="card-sec filter-card" data-filter="semanaAnterior" id="cardSemanaAnt">
+            <div class="card-sec filter-card" data-filter="semanaAnterior">
                 <div>
                     <div class="sec-label"><i class="bi bi-calendar-week"></i> Semana Passada</div>
                     <div class="sec-value" id="totalSemanaAnt">--</div>
@@ -826,7 +1343,7 @@
                 </div>
                 <div class="sec-right" id="diffSemanaAnt"></div>
             </div>
-            <div class="card-sec filter-card" data-filter="diaAnterior" id="cardDiaAnt">
+            <div class="card-sec filter-card" data-filter="diaAnterior">
                 <div>
                     <div class="sec-label"><i class="bi bi-calendar-day"></i> Ontem</div>
                     <div class="sec-value" id="totalDiaAnt">--</div>
@@ -834,7 +1351,7 @@
                 </div>
                 <div class="sec-right" id="diffDiaAnt"></div>
             </div>
-            <div class="card-sec" id="cardSemMadrugada">
+            <div class="card-sec">
                 <div>
                     <div class="sec-label"><i class="bi bi-sun"></i> Sem Boleto</div>
                     <div class="sec-value" id="totalRealizadoSemMadrugada">--</div>
@@ -844,425 +1361,550 @@
             </div>
         </div>
 
-        <!-- TABELA -->
         <div class="table-card">
             <h6><i class="bi bi-table"></i> Detalhamento por faixa horária — Atual vs Ano Anterior</h6>
             <div class="table-responsive">
-                <table id="dataTable">
+                <table>
                     <thead id="tableHeader"></thead>
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- GRÁFICO -->
         <div class="chart-card">
-            <div class="chart-card-header">
-                <h6><i class="bi bi-graph-up-arrow"></i> Evolução por faixa horária</h6>
-            </div>
+            <h6><i class="bi bi-graph-up-arrow"></i> Evolução por faixa horária</h6>
             <canvas id="salesChart"></canvas>
         </div>
     </main>
 
     <script>
-        // ================== CONFIGURAÇÃO ==================
+        // ==================== CONFIG ====================
         const HORARIOS = ["00:00/06:59", "07:00/07:59", "08:00/08:59", "09:00/09:59", "10:00/10:59", "11:00/11:59", "12:00/12:59", "13:00/13:59", "14:00/14:59", "15:00/15:59", "16:00/16:59", "17:00/17:59", "18:00/18:59", "19:00/19:59", "20:00/20:59", "21:00/21:59", "22:00/22:59", "23:00/23:59"];
-        const HORARIOS_MOBILE = ["00 | 07", "07 | 08", "08 | 09", "09 | 10", "10 | 11", "11 | 12", "12 | 13", "13 | 14", "14 | 15", "15 | 16", "16 | 17", "17 | 18", "18 | 19", "19 | 20", "20 | 21", "21 | 22", "22 | 23", "23 | 00"];
-        const EXPECTED_ROWS = 18;
-        const URL_API = 'https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMUHjhFbpnx22IjPaN3kXtSUR7ZItG1x1nofuOjRym_l2yN-f1vpyHXkAbSnhW5P71ZTPGfacEdx-vZAjr9KPavwPVmoSo8R-vZ-xvHxz49NK2-HUSXL6l0fxmDo2gmm-iLubVqjp_nTMjwhHLXx5T6m1iVGuQkHY7kekomrswp2Sjhksh1mi-PFsptMxGS59O4tFMcJK7aGVyptJII-RdPcCAMRTzxiQ6sEf69_OZwvA01kQTKgyXCGrW9YoKfIo0rbKWafhjxS9LmjYl8lDZcppgpEtQ&lib=MVV-mxIMeD1PmEZGEGHWErBcjUx3oCoSL';
-        let currentChart = null;
-        let activeFilters = new Set();
-        let anoAnterior = new Array(EXPECTED_ROWS).fill(0);
-        let semanaAnterior = new Array(EXPECTED_ROWS).fill(0);
-        let diaAnterior = new Array(EXPECTED_ROWS).fill(0);
-        let realizado = new Array(EXPECTED_ROWS).fill(0);
-        let participacao = new Array(EXPECTED_ROWS).fill(0);
-        let projecaoHoraria = new Array(EXPECTED_ROWS).fill(0);
-        let totalAnoAnt = 0, totalSemanaAnt = 0, totalDiaAnt = 0, totalRealizado = 0, projecaoFinal = 0;
-        let totalRealizadoSemMadrugada = 0;
-        let totalAnoAntSemMadrugada = 0;
+        const HORARIOS_MOB = ["00|07", "07|08", "08|09", "09|10", "10|11", "11|12", "12|13", "13|14", "14|15", "15|16", "16|17", "17|18", "18|19", "19|20", "20|21", "21|22", "22|23", "23|00"];
+        const EXPECTED = 18;
+        const URL_API = 'https://script.google.com/macros/s/AKfycbzxk25iIx0tFPpJV2x8PydJKWZHnueGHDjUWzYVQ-jC6jCW1_WNicNEIZuON7urHtuP/exec';
 
-        // Dark mode
-        function initDarkMode() {
-            const stored = localStorage.getItem('darkMode');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const isDark = stored === 'true' || (stored === null && prefersDark);
-            if (isDark) {
-                document.body.classList.add('dark');
-                document.getElementById('darkModeIcon').classList.remove('bi-moon-stars');
-                document.getElementById('darkModeIcon').classList.add('bi-sun');
-            } else {
-                document.body.classList.remove('dark');
-                document.getElementById('darkModeIcon').classList.remove('bi-sun');
-                document.getElementById('darkModeIcon').classList.add('bi-moon-stars');
+        let chart = null;
+        let filtros = new Set();
+        let dadosTodos = null;
+        let datasOrdem = [];
+        let dataAtual = null;           // data única atual (usada quando não há seleção múltipla)
+        let selectedDatesSet = new Set(); // datas selecionadas no modo multi
+        let lastSingleDate = null;       // última data clicada sozinha (para restaurar)
+
+        let anoAnt = zeros(), semAnt = zeros(), diaAnt = zeros(), real = zeros();
+        let part = zeros(), proj = zeros();
+        let totAno = 0, totSem = 0, totDia = 0, totReal = 0, projFinal = 0, realSemBol = 0, anoSemBol = 0;
+
+        function zeros() { return new Array(EXPECTED).fill(0); }
+
+        // ==================== DARK MODE ====================
+        (function () {
+            const s = localStorage.getItem('darkMode'), p = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (s === 'true' || (s === null && p)) { document.body.classList.add('dark'); document.getElementById('darkModeIcon').className = 'bi bi-sun'; }
+        })();
+        document.getElementById('btnDarkMode').addEventListener('click', () => {
+            const d = document.body.classList.toggle('dark');
+            document.getElementById('darkModeIcon').className = d ? 'bi bi-sun' : 'bi bi-moon-stars';
+            localStorage.setItem('darkMode', d);
+            buildChart();
+        });
+
+        // ==================== UTILS ====================
+        const mob = () => window.innerWidth < 768;
+        const fmt = v => (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        const fmtP = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+        const badge = v => v >= 0 ? `<span class="badge-up">▲ ${fmtP(v)}</span>` : `<span class="badge-down">▼ ${fmtP(v)}</span>`;
+
+        // ==================== CALENDÁRIO ====================
+        let calYear = null, calMonth = null, calSelected = null;
+
+        function abrirCal() { document.getElementById('calendarOverlay').classList.add('open'); renderCal(); }
+        function fecharCal() { document.getElementById('calendarOverlay').classList.remove('open'); }
+
+        function renderCal() {
+            const h = new Date();
+            if (!calYear) calYear = h.getFullYear();
+            if (calMonth === null) calMonth = h.getMonth();
+            document.getElementById('calMonthLabel').textContent =
+                new Date(calYear, calMonth, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            const g = document.getElementById('calGrid'); g.innerHTML = '';
+            const pd = new Date(calYear, calMonth, 1).getDay();
+            const ud = new Date(calYear, calMonth + 1, 0).getDate();
+            const hojeStr = h.toISOString().slice(0, 10);
+            for (let i = 0; i < pd; i++) { const e = document.createElement('div'); e.className = 'cal-day cal-empty'; g.appendChild(e); }
+            for (let d = 1; d <= ud; d++) {
+                const m2 = String(calMonth + 1).padStart(2, '0'), d2 = String(d).padStart(2, '0');
+                const k = `${calYear}-${m2}-${d2}`;
+                const tem = dadosTodos && dadosTodos[k] && dadosTodos[k].hasData === true; // só considera se tiver dados reais
+                const el = document.createElement('div');
+                el.className = 'cal-day'; el.textContent = d;
+                if (!tem) {
+                    el.classList.add('cal-no-data');
+                } else {
+                    el.classList.add('cal-has-data');
+                    // Long press no mobile = multi-select; Ctrl/Cmd+clique no desktop
+                    let pressTimer = null;
+                    el.addEventListener('touchstart', () => {
+                        pressTimer = setTimeout(() => {
+                            pressTimer = null;
+                            // Vibração haptica se disponível
+                            if (navigator.vibrate) navigator.vibrate(40);
+                            if (selectedDatesSet.has(k)) {
+                                selectedDatesSet.delete(k);
+                            } else {
+                                selectedDatesSet.add(k);
+                            }
+                            if (selectedDatesSet.size === 0 && lastSingleDate && dadosTodos[lastSingleDate] && dadosTodos[lastSingleDate].hasData) {
+                                selecionarData(lastSingleDate);
+                            } else if (selectedDatesSet.size > 0) {
+                                atualizarPorSelecaoMulti();
+                            }
+                            renderCal();
+                        }, 500);
+                    }, { passive: true });
+                    el.addEventListener('touchend', () => { if (pressTimer) clearTimeout(pressTimer); }, { passive: true });
+                    el.addEventListener('touchmove', () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }, { passive: true });
+                    // Evento de clique com suporte a Ctrl/Cmd para múltipla seleção
+                    el.addEventListener('click', (event) => {
+                        if (event.ctrlKey || event.metaKey) {
+                            // Comportamento multi: adiciona ou remove do Set
+                            if (selectedDatesSet.has(k)) {
+                                selectedDatesSet.delete(k);
+                            } else {
+                                selectedDatesSet.add(k);
+                            }
+                            // Se não houver nenhuma data selecionada, restaura o último dia único
+                            if (selectedDatesSet.size === 0 && lastSingleDate && dadosTodos[lastSingleDate] && dadosTodos[lastSingleDate].hasData) {
+                                selecionarData(lastSingleDate);
+                            } else if (selectedDatesSet.size > 0) {
+                                atualizarPorSelecaoMulti();
+                            }
+                            renderCal(); // redesenha o calendário para atualizar os destaques
+                        } else {
+                            // Comportamento normal: seleciona apenas este dia
+                            selectedDatesSet.clear();
+                            lastSingleDate = k;
+                            selecionarData(k);
+                            fecharCal();
+                        }
+                    });
+                }
+                // Destaque para datas no modo multi (fundos verdes)
+                if (selectedDatesSet.has(k)) {
+                    el.style.backgroundColor = 'var(--success)';
+                    el.style.color = '#fff';
+                } else if (selectedDatesSet.size === 0 && k === calSelected && tem) {
+                    // Modo normal: destaque azul para o dia ativo (apenas se tem dados)
+                    el.classList.add('cal-selected');
+                }
+                if (k === hojeStr) el.classList.add('cal-today');
+                g.appendChild(el);
             }
         }
-        function toggleDarkMode() {
-            const isDark = document.body.classList.toggle('dark');
-            const icon = document.getElementById('darkModeIcon');
-            if (isDark) {
-                icon.classList.remove('bi-moon-stars');
-                icon.classList.add('bi-sun');
-                localStorage.setItem('darkMode', 'true');
+
+        document.getElementById('calPrev').addEventListener('click', () => { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCal(); });
+        document.getElementById('calNext').addEventListener('click', () => { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCal(); });
+        document.getElementById('btnCalendario').addEventListener('click', e => {
+            e.stopPropagation();
+            document.getElementById('calendarOverlay').classList.contains('open') ? fecharCal() : abrirCal();
+        });
+        document.getElementById('calendarOverlay').addEventListener('click', e => { if (e.target === document.getElementById('calendarOverlay')) fecharCal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharCal(); });
+
+        // ==================== NAVEGAÇÃO DIA ====================
+        document.getElementById('btnDiaAnt').addEventListener('click', () => {
+            if (selectedDatesSet.size > 0) return;
+            const i = datasOrdem.indexOf(dataAtual); if (i > 0) selecionarData(datasOrdem[i - 1]);
+        });
+        document.getElementById('btnDiaProx').addEventListener('click', () => {
+            if (selectedDatesSet.size > 0) return;
+            const i = datasOrdem.indexOf(dataAtual); if (i < datasOrdem.length - 1) selecionarData(datasOrdem[i + 1]);
+        });
+        function atualizarBotoes() {
+            const i = datasOrdem.indexOf(dataAtual);
+            document.getElementById('btnDiaAnt').disabled = (selectedDatesSet.size > 0) || (i <= 0);
+            document.getElementById('btnDiaProx').disabled = (selectedDatesSet.size > 0) || (i >= datasOrdem.length - 1);
+        }
+        function atualizarLabel(k) {
+            if (selectedDatesSet.size > 0) {
+                document.getElementById('calDateLabel').textContent = `${selectedDatesSet.size} dia(s) selecionado(s)`;
             } else {
-                icon.classList.remove('bi-sun');
-                icon.classList.add('bi-moon-stars');
-                localStorage.setItem('darkMode', 'false');
+                const [a, m, d] = k.split('-');
+                document.getElementById('calDateLabel').textContent = `${d}/${m}/${a}`;
+                calYear = +a; calMonth = +m - 1; calSelected = k;
             }
-            rebuildChart();
-        }
-        document.getElementById('btnDarkMode').addEventListener('click', toggleDarkMode);
-        initDarkMode();
-
-        function isMobile() { return window.innerWidth < 768; }
-        function getChartLabels() { return isMobile() ? HORARIOS_MOBILE : HORARIOS; }
-        function getTableLabel(idx) { return isMobile() ? HORARIOS_MOBILE[idx] : HORARIOS[idx]; }
-        function fmt(v) { return (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
-        function fmtPct(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
-        function badgeGrowth(val) {
-            if (val >= 0) return `<span class="badge-up">▲ ${fmtPct(val)}</span>`;
-            return `<span class="badge-down">▼ ${fmtPct(val)}</span>`;
         }
 
-        function calcularProjecao() {
-            totalAnoAnt = anoAnterior.reduce((a, b) => a + (b || 0), 0);
-            totalSemanaAnt = semanaAnterior.reduce((a, b) => a + (b || 0), 0);
-            totalDiaAnt = diaAnterior.reduce((a, b) => a + (b || 0), 0);
-            totalRealizadoSemMadrugada = 0;
-            totalAnoAntSemMadrugada = 0;
-            for (let i = 1; i < EXPECTED_ROWS; i++) {
-                if (realizado[i] > 0) {
-                    totalRealizadoSemMadrugada += realizado[i];
-                    totalAnoAntSemMadrugada += anoAnterior[i] || 0;
+        // ==================== SELECIONAR DATA (ÚNICA) ====================
+        function toN(v) { return Number(v) || 0; }
+        function pad(arr) { const r = arr.slice(0, EXPECTED).map(toN); while (r.length < EXPECTED) r.push(0); return r; }
+
+        function selecionarData(k) {
+            if (!dadosTodos || !dadosTodos[k] || !dadosTodos[k].hasData) return;
+            dataAtual = k;
+            const d = dadosTodos[k];
+            anoAnt = pad(d.anoAnterior); semAnt = pad(d.semanaAnterior); diaAnt = pad(d.diaAnterior); real = pad(d.realizado);
+            atualizarLabel(k);
+            atualizarBotoes();
+            localStorage.setItem('ultimaData', k);
+            document.getElementById('btnClearSelection').style.display = 'none';
+            refresh();
+        }
+
+        function popularDatas() {
+            if (!dadosTodos) return;
+            // Marcar quais datas realmente possuem dados
+            for (let date in dadosTodos) {
+                const d = dadosTodos[date];
+                const hasData = d.anoAnterior.some(v => v > 0) ||
+                    d.semanaAnterior.some(v => v > 0) ||
+                    d.diaAnterior.some(v => v > 0) ||
+                    d.realizado.some(v => v > 0);
+                d.hasData = hasData;
+                if (!hasData) {
+                    delete dadosTodos[date];
                 }
             }
-            for (let i = 0; i < EXPECTED_ROWS; i++)
-                participacao[i] = totalAnoAnt ? anoAnterior[i] / totalAnoAnt : 0;
-            totalRealizado = 0;
-            let horasRealizadas = [];
-            for (let i = 0; i < EXPECTED_ROWS; i++)
-                if (realizado[i] > 0) { totalRealizado += realizado[i]; horasRealizadas.push(i); }
-            let somaPart = horasRealizadas.reduce((s, i) => s + participacao[i], 0);
-            projecaoFinal = somaPart ? totalRealizado / somaPart : 0;
-            for (let i = 0; i < EXPECTED_ROWS; i++)
-                projecaoHoraria[i] = (realizado[i] > 0) ? realizado[i] : projecaoFinal * participacao[i];
+            datasOrdem = Object.keys(dadosTodos).sort();
+            if (datasOrdem.length) {
+                const [a, m] = datasOrdem[datasOrdem.length - 1].split('-').map(Number);
+                calYear = a; calMonth = m - 1;
+            }
+            // Tentar selecionar a data atual (hoje)
+            const hoje = new Date();
+            const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+            let dataInicial = null;
+            if (dadosTodos[hojeStr] && dadosTodos[hojeStr].hasData) {
+                dataInicial = hojeStr;
+            } else {
+                // Se hoje não tem dados, usa a última data disponível
+                dataInicial = localStorage.getItem('ultimaData');
+                if (!dataInicial || !dadosTodos[dataInicial]) dataInicial = datasOrdem[datasOrdem.length - 1];
+            }
+            if (dataInicial) selecionarData(dataInicial);
         }
 
+        // ==================== MULTI SELECT: SOMA DAS DATAS ====================
+        function atualizarPorSelecaoMulti() {
+            if (selectedDatesSet.size === 0) {
+                if (lastSingleDate && dadosTodos[lastSingleDate] && dadosTodos[lastSingleDate].hasData) {
+                    selecionarData(lastSingleDate);
+                } else if (dataAtual && dadosTodos[dataAtual] && dadosTodos[dataAtual].hasData) {
+                    selecionarData(dataAtual);
+                }
+                document.getElementById('btnClearSelection').style.display = 'none';
+                return;
+            }
+
+            let somaAno = zeros();
+            let somaSem = zeros();
+            let somaDia = zeros();
+            let somaReal = zeros();
+
+            for (let date of selectedDatesSet) {
+                if (dadosTodos && dadosTodos[date] && dadosTodos[date].hasData) {
+                    let d = dadosTodos[date];
+                    for (let i = 0; i < EXPECTED; i++) {
+                        somaAno[i] += (d.anoAnterior[i] || 0);
+                        somaSem[i] += (d.semanaAnterior[i] || 0);
+                        somaDia[i] += (d.diaAnterior[i] || 0);
+                        somaReal[i] += (d.realizado[i] || 0);
+                    }
+                }
+            }
+
+            anoAnt = somaAno;
+            semAnt = somaSem;
+            diaAnt = somaDia;
+            real = somaReal;
+
+            document.getElementById('calDateLabel').textContent = `${selectedDatesSet.size} dia(s) selecionado(s)`;
+            document.getElementById('btnDiaAnt').disabled = true;
+            document.getElementById('btnDiaProx').disabled = true;
+            document.getElementById('btnClearSelection').style.display = 'flex';
+
+            calcProj();
+            updateCards();  // updateCards já tratará de zerar os cards secundários quando multi
+            buildChart();
+            renderTable();
+        }
+
+        // Botão "Limpar seleção"
+        document.getElementById('btnClearSelection').addEventListener('click', () => {
+            if (selectedDatesSet.size > 0) {
+                selectedDatesSet.clear();
+                if (lastSingleDate && dadosTodos[lastSingleDate] && dadosTodos[lastSingleDate].hasData) {
+                    selecionarData(lastSingleDate);
+                } else if (datasOrdem.length) {
+                    selecionarData(datasOrdem[datasOrdem.length - 1]);
+                }
+                renderCal();
+            }
+        });
+
+        // ==================== PROJEÇÃO ====================
+        function calcProj() {
+            totAno = anoAnt.reduce((a, b) => a + b, 0);
+            totSem = semAnt.reduce((a, b) => a + b, 0);
+            totDia = diaAnt.reduce((a, b) => a + b, 0);
+            realSemBol = 0; anoSemBol = 0;
+            for (let i = 1; i < EXPECTED; i++) {
+                if (real[i] > 0) {
+                    realSemBol += real[i];
+                    anoSemBol += anoAnt[i] || 0;
+                }
+            }
+            if (totAno > 0) {
+                for (let i = 0; i < EXPECTED; i++) part[i] = anoAnt[i] / totAno;
+            } else {
+                for (let i = 0; i < EXPECTED; i++) part[i] = 1 / EXPECTED;
+            }
+
+            totReal = 0;
+            const hrs = [];
+            for (let i = 0; i < EXPECTED; i++) {
+                if (real[i] > 0) {
+                    totReal += real[i];
+                    hrs.push(i);
+                }
+            }
+
+            const sp = hrs.reduce((s, i) => s + part[i], 0);
+            projFinal = (sp > 0 && totReal > 0) ? totReal / sp : 0;
+
+            for (let i = 0; i < EXPECTED; i++) {
+                if (real[i] > 0) {
+                    proj[i] = real[i];
+                } else {
+                    proj[i] = (projFinal > 0 && isFinite(part[i])) ? projFinal * part[i] : 0;
+                }
+            }
+        }
+
+        // ==================== CARDS ====================
+        // ==================== CARDS ====================
         function updateCards() {
-            document.getElementById('totalRealizado').textContent = fmt(totalRealizado);
-            document.getElementById('projecaoFinal').textContent = fmt(projecaoFinal);
-            document.getElementById('totalAnoAnt').textContent = fmt(totalAnoAnt);
+            const isMulti = (selectedDatesSet.size > 1);
 
-            let growthProj = totalAnoAnt ? ((projecaoFinal - totalAnoAnt) / totalAnoAnt) * 100 : 0;
-            document.getElementById('crescimentoProj').innerHTML = badgeGrowth(growthProj);
+            document.getElementById('totalRealizado').textContent = fmt(totReal);
+            document.getElementById('projecaoFinal').textContent = fmt(projFinal);
+            document.getElementById('totalAnoAnt').textContent = fmt(totAno);
 
-            let somaAnoAntMesmasHoras = 0;
-            let horasRealizadasIdx = [];
-            for (let i = 0; i < EXPECTED_ROWS; i++) {
-                if (realizado[i] > 0) {
-                    horasRealizadasIdx.push(i);
-                    somaAnoAntMesmasHoras += anoAnterior[i] || 0;
-                }
+            let crescimentoProjHtml = '<span class="dash-cell">—</span>';
+            if (totAno > 0 && isFinite(projFinal)) {
+                crescimentoProjHtml = badge(((projFinal - totAno) / totAno) * 100);
             }
-            let crescElReal = document.getElementById('crescimentoReal');
-            if (horasRealizadasIdx.length > 0 && somaAnoAntMesmasHoras > 0) {
-                let growthReal = ((totalRealizado - somaAnoAntMesmasHoras) / somaAnoAntMesmasHoras) * 100;
-                crescElReal.innerHTML = badgeGrowth(growthReal);
-            } else {
-                crescElReal.innerHTML = '';
+            document.getElementById('crescimentoProj').innerHTML = crescimentoProjHtml;
+
+            let anoMesmas = 0;
+            for (let i = 0; i < EXPECTED; i++) if (real[i] > 0) anoMesmas += anoAnt[i] || 0;
+            let crescimentoRealHtml = '<span class="dash-cell">—</span>';
+            if (totReal > 0 && anoMesmas > 0) {
+                crescimentoRealHtml = badge(((totReal - anoMesmas) / anoMesmas) * 100);
             }
+            document.getElementById('crescimentoReal').innerHTML = crescimentoRealHtml;
 
-            document.getElementById('totalSemanaAnt').textContent = fmt(totalSemanaAnt);
-            document.getElementById('totalDiaAnt').textContent = fmt(totalDiaAnt);
-
-            let diffSem = totalSemanaAnt ? ((projecaoFinal - totalSemanaAnt) / totalSemanaAnt) * 100 : 0;
-            let diffDia = totalDiaAnt ? ((projecaoFinal - totalDiaAnt) / totalDiaAnt) * 100 : 0;
-
-            document.getElementById('diffSemanaAnt').innerHTML = badgeGrowth(diffSem);
-            document.getElementById('diffDiaAnt').innerHTML = badgeGrowth(diffDia);
-
-            document.getElementById('refSemanaAnt').innerHTML = `Ano anterior: ${fmt(totalAnoAnt)}`;
-            document.getElementById('refDiaAnt').innerHTML = `Ano anterior: ${fmt(totalAnoAnt)}`;
-            document.getElementById('refSemMadrugada').innerHTML = `Ano anterior: ${fmt(totalAnoAntSemMadrugada)}`;
-
-            document.getElementById('totalRealizadoSemMadrugada').textContent = totalRealizadoSemMadrugada > 0 ? fmt(totalRealizadoSemMadrugada) : '--';
-            if (totalRealizadoSemMadrugada > 0 && totalAnoAntSemMadrugada > 0) {
-                let growthSemMadrugada = ((totalRealizadoSemMadrugada - totalAnoAntSemMadrugada) / totalAnoAntSemMadrugada) * 100;
-                document.getElementById('crescimentoSemMadrugada').innerHTML = badgeGrowth(growthSemMadrugada);
-            } else {
+            // Para os cards secundários: se multi, zerar valores e mostrar "--"
+            if (isMulti) {
+                document.getElementById('totalSemanaAnt').textContent = '--';
+                document.getElementById('totalDiaAnt').textContent = '--';
+                document.getElementById('diffSemanaAnt').innerHTML = '<span class="dash-cell">—</span>';
+                document.getElementById('diffDiaAnt').innerHTML = '<span class="dash-cell">—</span>';
+                document.getElementById('refSemanaAnt').innerHTML = `Ano anterior: --`;
+                document.getElementById('refDiaAnt').innerHTML = `Ano anterior: --`;
+                // O card "Sem Boleto" pode continuar normal? Vamos manter zerado também? O pedido não inclui, mas para consistência:
+                document.getElementById('totalRealizadoSemMadrugada').textContent = '--';
                 document.getElementById('crescimentoSemMadrugada').innerHTML = '<span class="dash-cell">—</span>';
+                document.getElementById('refSemMadrugada').innerHTML = `Ano anterior: --`;
+            } else {
+                document.getElementById('totalSemanaAnt').textContent = fmt(totSem);
+                document.getElementById('totalDiaAnt').textContent = fmt(totDia);
+
+                let diffSemanaHtml = '<span class="dash-cell">—</span>';
+                if (totSem > 0 && isFinite(projFinal)) diffSemanaHtml = badge(((projFinal - totSem) / totSem) * 100);
+                document.getElementById('diffSemanaAnt').innerHTML = diffSemanaHtml;
+
+                let diffDiaHtml = '<span class="dash-cell">—</span>';
+                if (totDia > 0 && isFinite(projFinal)) diffDiaHtml = badge(((projFinal - totDia) / totDia) * 100);
+                document.getElementById('diffDiaAnt').innerHTML = diffDiaHtml;
+
+                document.getElementById('refSemanaAnt').innerHTML = `Ano anterior: ${fmt(totAno)}`;
+                document.getElementById('refDiaAnt').innerHTML = `Ano anterior: ${fmt(totAno)}`;
+                document.getElementById('refSemMadrugada').innerHTML = `Ano anterior: ${fmt(anoSemBol)}`;
+                document.getElementById('totalRealizadoSemMadrugada').textContent = realSemBol > 0 ? fmt(realSemBol) : '--';
+
+                let crescSemMadrugadaHtml = '<span class="dash-cell">—</span>';
+                if (realSemBol > 0 && anoSemBol > 0) {
+                    crescSemMadrugadaHtml = badge(((realSemBol - anoSemBol) / anoSemBol) * 100);
+                }
+                document.getElementById('crescimentoSemMadrugada').innerHTML = crescSemMadrugadaHtml;
             }
         }
 
-        function getChartColors() {
-            const isDark = document.body.classList.contains('dark');
-            return {
-                gridColor: isDark ? 'rgba(44,62,78,0.8)' : '#f0f3f8',
-                tickColor: isDark ? '#9ab3cf' : '#5f7f9e',
-            };
-        }
-
-        function rebuildChart() {
-            if (currentChart) currentChart.destroy();
+        // ==================== GRÁFICO ====================
+        function buildChart() {
+            if (chart) chart.destroy();
             const ctx = document.getElementById('salesChart').getContext('2d');
-            const { gridColor, tickColor } = getChartColors();
-            const realizadoSerie = realizado.map(v => v > 0 ? v : null);
-            const projetadoSerie = projecaoHoraria.map((v, i) => realizado[i] > 0 ? null : v);
-            let lastRealIdx = -1;
-            for (let i = 0; i < EXPECTED_ROWS; i++) if (realizado[i] > 0) lastRealIdx = i;
-            const intersecaoSerie = new Array(EXPECTED_ROWS).fill(null);
-            if (lastRealIdx >= 0 && lastRealIdx + 1 < EXPECTED_ROWS) {
-                intersecaoSerie[lastRealIdx] = projecaoHoraria[lastRealIdx];
-                intersecaoSerie[lastRealIdx + 1] = projecaoHoraria[lastRealIdx + 1];
-            }
+            const dk = document.body.classList.contains('dark');
+            const gc = dk ? 'rgba(44,62,78,.8)' : '#f0f3f8', tc = dk ? '#9ab3cf' : '#5f7f9e';
+            const rSerie = real.map(v => v > 0 ? v : null);
+            const pSerie = proj.map((v, i) => real[i] > 0 ? null : v);
+            let last = -1; for (let i = 0; i < EXPECTED; i++) if (real[i] > 0) last = i;
+            const br = new Array(EXPECTED).fill(null);
+            if (last >= 0 && last + 1 < EXPECTED) { br[last] = proj[last]; br[last + 1] = proj[last + 1]; }
+            const lbl = mob() ? HORARIOS_MOB : HORARIOS;
 
-            const allDatasets = [
-                { id: 'realizado', label: '✅ Realizado', data: realizadoSerie, borderColor: '#2176c7', backgroundColor: 'rgba(33,118,199,0.08)', borderWidth: 2.5, tension: 0.25, pointRadius: 3, pointHoverRadius: 6, fill: false },
-                { id: 'projecao', label: '📊 Projetado', data: projetadoSerie, borderColor: '#85bef0', backgroundColor: 'rgba(133,190,240,0.05)', borderWidth: 2, borderDash: [6, 5], tension: 0.25, pointRadius: 2, pointHoverRadius: 4, fill: false },
-                { id: 'projecao', _bridgeOnly: true, label: null, data: intersecaoSerie, borderColor: '#85bef0', borderWidth: 2, borderDash: [], tension: 0, pointRadius: 0, pointHoverRadius: 0, fill: false },
-                { id: 'anoAnterior', label: '📅 Ano Anterior', data: anoAnterior, borderColor: '#b0c8e0', borderWidth: 1.8, tension: 0.2, pointRadius: 2, fill: false },
-                { id: 'semanaAnterior', label: '📆 Semana Anterior', data: semanaAnterior, borderColor: '#c5d8e8', borderWidth: 1.5, borderDash: [3, 4], tension: 0.2, pointRadius: 1, fill: false },
-                { id: 'diaAnterior', label: '📆 Dia Anterior', data: diaAnterior, borderColor: '#d5e5f0', borderWidth: 1.5, borderDash: [2, 4], tension: 0.2, pointRadius: 1, fill: false }
+            const ds = [
+                { id: 'realizado', label: '✅ Realizado', data: rSerie, borderColor: '#2176c7', backgroundColor: 'rgba(33,118,199,.08)', borderWidth: 2.5, tension: .25, pointRadius: 3, pointHoverRadius: 6, fill: false },
+                { id: 'projecao', label: '📊 Projetado', data: pSerie, borderColor: '#85bef0', backgroundColor: 'rgba(133,190,240,.05)', borderWidth: 2, borderDash: [6, 5], tension: .25, pointRadius: 2, pointHoverRadius: 4, fill: false },
+                { id: 'projecao_aux', _b: true, label: null, data: br, borderColor: '#85bef0', borderWidth: 2, borderDash: [], tension: 0, pointRadius: 0, pointHoverRadius: 0, fill: false },
+                { id: 'anoAnterior', label: '📅 Ano Anterior', data: anoAnt, borderColor: '#b0c8e0', borderWidth: 1.8, tension: .2, pointRadius: 2, fill: false },
+                { id: 'semanaAnterior', label: '📆 Semana Anterior', data: semAnt, borderColor: '#c5d8e8', borderWidth: 1.5, borderDash: [3, 4], tension: .2, pointRadius: 1, fill: false },
+                { id: 'diaAnterior', label: '📆 Dia Anterior', data: diaAnt, borderColor: '#d5e5f0', borderWidth: 1.5, borderDash: [2, 4], tension: .2, pointRadius: 1, fill: false }
             ];
 
-            allDatasets.forEach(ds => {
-                if (activeFilters.size === 0) {
-                    ds.hidden = !['realizado', 'projecao', 'anoAnterior', 'diaAnterior'].includes(ds.id);
+            const isMulti = (selectedDatesSet.size > 1);
+            ds.forEach(d => {
+                if (d._b) return;
+                if (isMulti && (d.id === 'semanaAnterior' || d.id === 'diaAnterior')) {
+                    d.hidden = true;
+                    return;
+                }
+                if (filtros.size === 0) {
+                    d.hidden = !['realizado', 'projecao', 'anoAnterior', 'diaAnterior'].includes(d.id);
                 } else {
-                    if (ds.id === 'anoAnterior') {
-                        ds.hidden = false;
-                    } else if (ds.id === 'diaAnterior') {
-                        ds.hidden = activeFilters.has('diaAnterior') ? false : !activeFilters.has(ds.id);
-                    } else {
-                        ds.hidden = !activeFilters.has(ds.id);
-                    }
+                    d.hidden = !filtros.has(d.id);
                 }
             });
 
-            const bridgeDatasetIndex = allDatasets.findIndex(ds => ds._bridgeOnly);
-            const mobile = isMobile();
-            currentChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: getChartLabels(), datasets: allDatasets },
+            const bi = ds.findIndex(d => d._b), m = mob();
+            chart = new Chart(ctx, {
+                type: 'line', data: { labels: lbl, datasets: ds },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    interaction: { mode: 'index', intersect: false },
-                    animation: { duration: 400 },
+                    responsive: true, maintainAspectRatio: true, interaction: { mode: 'index', intersect: false }, animation: { duration: 400 },
                     plugins: {
-                        legend: {
-                            display: true,
-                            position: mobile ? 'bottom' : 'top',
-                            labels: {
-                                boxWidth: mobile ? 10 : 12,
-                                font: { size: mobile ? 9 : 10 },
-                                padding: mobile ? 8 : 10,
-                                filter: (item) => item.datasetIndex !== bridgeDatasetIndex
-                            }
-                        },
+                        legend: { display: true, position: m ? 'bottom' : 'top', labels: { boxWidth: m ? 10 : 12, font: { size: m ? 9 : 10 }, padding: m ? 8 : 10, filter: item => item.datasetIndex !== bi } },
                         tooltip: {
-                            backgroundColor: document.body.classList.contains('dark') ? '#1e2936' : '#fff',
-                            titleColor: document.body.classList.contains('dark') ? '#eef2f8' : '#1a2c3e',
-                            bodyColor: document.body.classList.contains('dark') ? '#9ab3cf' : '#5f7f9e',
-                            borderColor: document.body.classList.contains('dark') ? '#2c3e4e' : '#dce5f0',
-                            borderWidth: 1,
-                            padding: 10,
-                            callbacks: {
-                                label: ctx => {
-                                    if (ctx.dataset._bridgeOnly) return null;
-                                    if (ctx.raw === null || ctx.raw === undefined) return null;
-                                    return `${ctx.dataset.label}: ${fmt(ctx.raw)}`;
-                                }
-                            }
+                            backgroundColor: dk ? '#1e2936' : '#fff', titleColor: dk ? '#eef2f8' : '#1a2c3e', bodyColor: dk ? '#9ab3cf' : '#5f7f9e', borderColor: dk ? '#2c3e4e' : '#dce5f0', borderWidth: 1, padding: 10,
+                            callbacks: { label: c => { if (c.dataset._b || c.raw === null || c.raw === undefined) return null; return `${c.dataset.label}: ${fmt(c.raw)}`; } }
                         }
                     },
                     scales: {
-                        x: {
-                            ticks: {
-                                font: { size: mobile ? 7 : 9 },
-                                maxRotation: 45,
-                                autoSkip: true,
-                                color: tickColor
-                            },
-                            grid: { color: gridColor }
-                        },
-                        y: {
-                            ticks: {
-                                font: { size: mobile ? 8 : 9 },
-                                color: tickColor,
-                                callback: v => v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v
-                            },
-                            grid: { color: gridColor }
-                        }
+                        x: { ticks: { font: { size: m ? 7 : 9 }, maxRotation: 45, autoSkip: true, color: tc }, grid: { color: gc } },
+                        y: { ticks: { font: { size: m ? 8 : 9 }, color: tc, callback: v => v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v }, grid: { color: gc } }
                     }
                 }
             });
         }
 
+        // ==================== TABELA ====================
         function renderTable() {
-            const filterDataMap = { semanaAnterior: { label: 'Sem. Ant.', data: semanaAnterior }, diaAnterior: { label: 'Dia Ant.', data: diaAnterior } };
-            const activeDataFilter = [...activeFilters].find(f => filterDataMap[f]);
-            const filterInfo = activeDataFilter ? filterDataMap[activeDataFilter] : null;
-            let headerExtra = filterInfo ? `<th class="col-filter"><i class="bi bi-funnel-fill"></i> ${filterInfo.label}</th>` : '';
-            document.getElementById('tableHeader').innerHTML = `<tr><th class="col-hora">Horário</th><th class="col-anoant">Ano Anterior</th><th class="col-real-proj">Realizado</th><th class="col-badge">%</th>${headerExtra}</tr>`;
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            for (let i = 0; i < EXPECTED_ROWS; i++) {
-                const isRealizado = realizado[i] > 0;
-                const real = realizado[i];
-                const proj = projecaoHoraria[i];
-                const anoAnt = anoAnterior[i];
-                let badgeReal = '<span class="dash-cell">—</span>';
-                if (isRealizado && anoAnt > 0) { const pct = ((real - anoAnt) / anoAnt) * 100; badgeReal = badgeGrowth(pct); }
-                const rowClass = isRealizado ? 'row-done' : 'row-proj';
-                let extraCell = '';
-                if (filterInfo) { const fVal = filterInfo.data[i] || 0; extraCell = `<td class="col-filter-val">${fVal > 0 ? fmt(fVal) : '<span class="dash-cell">—</span>'}</td>`; }
-                let barHtml = '';
-                if (isRealizado && anoAnt > 0) { const pct = Math.min((real / anoAnt) * 100, 150); const barColor = real >= anoAnt ? 'var(--success)' : 'var(--danger)'; barHtml = `<div class="mini-bar-wrap"><div class="mini-bar" style="width:${Math.min(pct, 100)}%;background:${barColor}"></div></div>`; }
-                const label = getTableLabel(i);
-                let cellContent = '';
-                if (isRealizado) { cellContent = `<div class="real-wrap"><strong>${fmt(real)}</strong><i class="bi bi-check-circle-fill" style="color:var(--success);font-size:0.6rem"></i></div>${barHtml}`; }
-                else { cellContent = `<span class="proj-val">${fmt(proj)}</span>`; }
-                tbody.innerHTML += `<tr class="${rowClass}"><td class="col-hora"><span class="hora-badge">${label}</span></td><td class="col-anoant">${anoAnt > 0 ? fmt(anoAnt) : '<span class="dash-cell">—</span>'}</td><td class="col-real-proj">${cellContent}</td><td class="col-badge">${badgeReal}</td>${extraCell}</tr>`;
+            const isMulti = (selectedDatesSet.size > 1);
+            const fm = { semanaAnterior: { label: 'Sem. Ant.', data: semAnt }, diaAnterior: { label: 'Dia Ant.', data: diaAnt } };
+            const af = (!isMulti && filtros.size > 0) ? [...filtros].find(f => fm[f]) : null;
+            const fi = af ? fm[af] : null;
+
+            document.getElementById('tableHeader').innerHTML =
+                `<tr><th class="col-hora">Horário</th><th class="col-anoant">Ano Anterior</th><th class="col-real-proj">Realizado</th><th class="col-badge">%</th>${fi ? `<th><i class="bi bi-funnel-fill"></i> ${fi.label}</th>` : ''}</tr>`;
+            const tb = document.getElementById('tableBody'); tb.innerHTML = '';
+            for (let i = 0; i < EXPECTED; i++) {
+                const isR = real[i] > 0, rv = real[i], pv = proj[i], av = anoAnt[i];
+                let bg = '<span class="dash-cell">—</span>';
+                if (isR && av > 0) bg = badge(((rv - av) / av) * 100);
+                let bar = '';
+                if (isR && av > 0) { const p = Math.min((rv / av) * 100, 100); bar = `<div class="mini-bar-wrap"><div class="mini-bar" style="width:${p}%;background:${rv >= av ? 'var(--success)' : 'var(--danger)'}"></div></div>`; }
+                const lbl = mob() ? HORARIOS_MOB[i] : HORARIOS[i];
+                const cell = isR ? `<div class="real-wrap"><strong>${fmt(rv)}</strong><i class="bi bi-check-circle-fill" style="color:var(--success);font-size:.6rem"></i></div>${bar}` : `<span class="proj-val">${fmt(pv)}</span>`;
+                const ex = fi ? `<td class="col-filter-val">${(fi.data[i] || 0) > 0 ? fmt(fi.data[i]) : '<span class="dash-cell">—</span>'}</td>` : '';
+                tb.innerHTML += `<tr class="${isR ? 'row-done' : 'row-proj'}"><td class="col-hora"><span class="hora-badge">${lbl}</span></td><td class="col-anoant">${av > 0 ? fmt(av) : '<span class="dash-cell">—</span>'}</td><td class="col-real-proj">${cell}</td><td class="col-badge">${bg}</td>${ex}</tr>`;
             }
         }
 
-        function fullUpdate() { calcularProjecao(); updateCards(); rebuildChart(); renderTable(); }
-        function loadDataFromArrays(ano, sem, dia, real) {
-            anoAnterior = ano.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
-            semanaAnterior = sem.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
-            const diaArr = (dia && dia.length > 0) ? dia : [];
-            diaAnterior = Array.from({ length: EXPECTED_ROWS }, (_, i) => Number(diaArr[i]) || 0);
-            realizado = real.slice(0, EXPECTED_ROWS).map(v => Number(v) || 0);
-            fullUpdate();
-        }
-        // ================== CACHE ==================
-        const CACHE_KEY = 'vendas_cache';
-        const CACHE_TTL_KEY = 'vendas_cache_expiry';
-        const CACHE_INTERVAL_MS = 5 * 60 * 1000; // atualiza API a cada 5 min
+        function refresh() { calcProj(); updateCards(); buildChart(); renderTable(); }
 
-        function getMidnightTimestamp() {
-            const now = new Date();
-            const meia_noite = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
-            return meia_noite.getTime();
-        }
+        // ==================== FILTROS ====================
+        document.querySelectorAll('.filter-card').forEach(c => {
+            if (c.dataset.filter) c.addEventListener('click', () => {
+                const f = c.dataset.filter;
+                filtros.has(f) ? filtros.delete(f) : filtros.add(f);
+                document.querySelectorAll('.filter-card').forEach(x => { if (x.dataset.filter) x.classList.toggle('filter-active', filtros.has(x.dataset.filter)); });
+                buildChart(); renderTable();
+            });
+        });
+        document.getElementById('btnResetFiltros').addEventListener('click', () => {
+            filtros.clear(); document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('filter-active')); buildChart(); renderTable();
+        });
 
-        function salvarCache(dados) {
-            try {
-                localStorage.setItem(CACHE_KEY, JSON.stringify(dados));
-                localStorage.setItem(CACHE_TTL_KEY, getMidnightTimestamp().toString());
-            } catch (e) {
-                console.warn('Cache não pôde ser salvo:', e);
-            }
-        }
-
-        function lerCache() {
-            try {
-                const expiry = parseInt(localStorage.getItem(CACHE_TTL_KEY) || '0', 10);
-                if (Date.now() >= expiry) {
-                    localStorage.removeItem(CACHE_KEY);
-                    localStorage.removeItem(CACHE_TTL_KEY);
-                    return null;
-                }
-                const raw = localStorage.getItem(CACHE_KEY);
-                return raw ? JSON.parse(raw) : null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function limparCacheSeNovoDia() {
-            const expiry = parseInt(localStorage.getItem(CACHE_TTL_KEY) || '0', 10);
-            if (expiry > 0 && Date.now() >= expiry) {
-                localStorage.removeItem(CACHE_KEY);
-                localStorage.removeItem(CACHE_TTL_KEY);
-            }
-        }
-
-        // ================== API ==================
-        async function buscarDadosDaAPI({ forcarAPI = false } = {}) {
-            const btnAtualizar = document.getElementById('btnAtualizar');
-            const btnIcon = btnAtualizar.querySelector('i');
-            btnAtualizar.disabled = true;
-            btnIcon.style.animation = 'spin 0.8s linear infinite';
-
-            limparCacheSeNovoDia();
-
-            // Tenta usar cache (exceto quando forçado pelo botão)
-            if (!forcarAPI) {
-                const cache = lerCache();
-                if (cache) {
-                    loadDataFromArrays(cache.anoAnterior, cache.semanaAnterior, cache.diaAnterior || [], cache.realizado);
-                    const dataStr = cache.ultimaAtualizacao
-                        ? new Date(cache.ultimaAtualizacao).toLocaleString('pt-BR')
-                        : new Date(cache._cachedAt).toLocaleString('pt-BR');
-                    document.getElementById('timestampApi').innerHTML =
-                        `<i class="bi bi-database-check" style="color:var(--blue-main)"></i> Cache: ${dataStr}`;
-                    btnIcon.style.animation = '';
-                    btnAtualizar.disabled = false;
-                    return;
-                }
-            }
-
+        // ==================== API ====================
+        async function buscarDados() {
+            const btn = document.getElementById('btnAtualizar'), ico = btn.querySelector('i');
+            btn.disabled = true; ico.style.animation = 'spin .8s linear infinite';
             document.getElementById('timestampApi').innerHTML = '<i class="bi bi-arrow-repeat"></i> Atualizando...';
             try {
                 const url = URL_API + (URL_API.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-                const response = await fetch(url, { cache: 'no-store' });
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                const dados = await response.json();
-                if (dados.anoAnterior && dados.semanaAnterior && dados.realizado) {
-                    dados._cachedAt = Date.now();
-                    salvarCache(dados);
-                    loadDataFromArrays(dados.anoAnterior, dados.semanaAnterior, dados.diaAnterior || [], dados.realizado);
-                    const dataStr = dados.ultimaAtualizacao
-                        ? new Date(dados.ultimaAtualizacao).toLocaleString('pt-BR')
-                        : new Date().toLocaleString('pt-BR');
-                    document.getElementById('timestampApi').innerHTML =
-                        `<i class="bi bi-check-circle-fill" style="color:var(--success)"></i> Atualizado: ${dataStr}`;
-                } else { throw new Error('JSON inválido'); }
-            } catch (erro) {
-                console.error('Erro API:', erro);
-                // Tenta usar cache mesmo expirado como último recurso
-                const cacheFallback = lerCache();
-                if (cacheFallback) {
-                    loadDataFromArrays(cacheFallback.anoAnterior, cacheFallback.semanaAnterior, cacheFallback.diaAnterior || [], cacheFallback.realizado);
-                    document.getElementById('timestampApi').innerHTML =
-                        `<i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i> Sem conexão — usando cache.`;
-                } else {
-                    document.getElementById('timestampApi').innerHTML =
-                        `<i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i> Erro ao carregar. Dados de exemplo.`;
-                    loadMockData();
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const dados = await res.json();
+                if (dados.dadosPorData) {
+                    dadosTodos = dados.dadosPorData;
+                    selectedDatesSet.clear();
+                    lastSingleDate = null;
+                    document.getElementById('btnClearSelection').style.display = 'none';
+                    popularDatas();
+                    const ts = dados.ultimaAtualizacao ? new Date(dados.ultimaAtualizacao).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR');
+                    document.getElementById('timestampApi').innerHTML = `<i class="bi bi-check-circle-fill" style="color:var(--success)"></i> Atualizado: ${ts}`;
+                } else throw new Error('Formato inválido');
+            } catch (e) {
+                console.error(e);
+                document.getElementById('timestampApi').innerHTML = `<i class="bi bi-exclamation-triangle-fill" style="color:#e67e22"></i> Modo demonstração – conecte a API para dados reais.`;
+                loadMock();
+            } finally { ico.style.animation = ''; btn.disabled = false; }
+        }
+        document.getElementById('btnAtualizar').addEventListener('click', buscarDados);
+
+        // ==================== MOCK ====================
+        function loadMock() {
+            dadosTodos = {
+                "2026-04-13": {
+                    anoAnterior: [10739.57, 15922.66, 77547.77, 128699.05, 204708.83, 182934.72, 154259.76, 159207.73, 154911.03, 188729.45, 203811.92, 177470.75, 88439.18, 44186.48, 32735.78, 26484.74, 18752.41, 8117.14],
+                    semanaAnterior: [11119.21, 12989.63, 77790.09, 139135.29, 175548.44, 182645.46, 159681.8, 137868.52, 133588.05, 177914.46, 168571.55, 132489.66, 65574.89, 34879.39, 22956.48, 12085.53, 11689.57, 6793.23],
+                    diaAnterior: [9214.07, 2157.69, 4390.8, 14083.96, 25646.49, 25227.69, 27383.86, 54006.43, 55352.52, 39108.06, 33238.08, 26224.08, 30658.39, 35912.45, 20800.27, 11131.37, 8825.53, 4961.79],
+                    realizado: [10285.66, 13259.54, 78624.57, 156191.48, 226992.19, 189968.22, 169461.8, 100823.62, 25483.29, 119990.24, 240966.56, 116155.96, 61365.38, 31978.46, 34693.04, 32991.06, 12164.32, 13292.58]
+                },
+                "2026-04-14": {
+                    anoAnterior: [170176.48, 53592.16, 94902.13, 134404.69, 187297.92, 202306.65, 136942.25, 121408.4, 158054.08, 164874.1, 170609.29, 196747.72, 79617.94, 45744.07, 32031.55, 25196.2, 14859.2, 10306.81],
+                    semanaAnterior: [129207.36, 48963.65, 56455.54, 109797.25, 232766.87, 216377.6, 167081.83, 151717.87, 181419.92, 199333.6, 202592.42, 140922.95, 74449.7, 38821.01, 31852.5, 25351.3, 21003.25, 7135.79],
+                    diaAnterior: [10285.66, 13259.54, 78624.57, 156191.48, 226992.19, 189968.22, 169461.8, 100823.62, 25483.29, 119990.24, 240966.56, 116155.96, 61365.38, 31978.46, 34693.04, 32991.06, 12164.32, 13292.58],
+                    realizado: [169340.5, 11970.32, 55710.12, 183587.85, 227332.62, 221431.12, 178539.86, 144773.8, 182202.7, 169153.13, 208550.68, 157133.59, 73858.98, 45874.19, 30372.38, 31675.49, 16485.01, 6137.26]
+                },
+                "2026-04-15": {
+                    anoAnterior: [230733.97, 33594.13, 90956.21, 120555.18, 181828.4, 172298.48, 178554.95, 113638.3, 138718.06, 148875.32, 168623.1, 131747.09, 51867.51, 35934.66, 23976.18, 26170.16, 9187.87, 0],
+                    semanaAnterior: [183988.46, 16600.66, 72840.18, 139129.31, 214156.44, 199732.86, 160317.43, 146708.56, 171101.9, 182556.16, 197063.86, 153669.52, 83004.47, 45203.16, 51638.44, 33245.97, 19344.65, 0],
+                    diaAnterior: [169340.5, 11970.32, 55710.12, 183551.17, 227332.62, 221431.12, 178539.86, 144773.8, 182202.7, 169153.13, 208550.68, 157133.59, 73858.98, 45874.19, 30372.38, 31675.49, 16485.01, 0],
+                    realizado: [148325.19, 16698.17, 55152.34, 120432.99, 170389.22, 193470.52, 162495.16, 138712.34, 238666.67, 151755.91, 179272.0, 162877.44, 80913.01, 47723.73, 33740.82, 30694.62, 19003.31, 0]
+                },
+                "2026-04-16": {
+                    anoAnterior: [209816.85, 45025.2, 83949.05, 125261.9, 183438.59, 155888.94, 126939.4, 100033.95, 126516.97, 97365.21, 120812.33, 147075.82, 37851.99, 20832.56, 14568.0, 8762.42, 7624.51, 2258.6],
+                    semanaAnterior: [151465.2, 17337.53, 79194.45, 123038.58, 213056.57, 208865.92, 161155.2, 159013.73, 186288.05, 170139.66, 199875.69, 136450.88, 62008.42, 48590.24, 22680.7, 29581.72, 15462.27, 4472.08],
+                    diaAnterior: [148325.19, 16698.17, 55152.34, 120432.99, 170389.22, 193470.52, 162495.16, 138712.34, 238666.67, 151755.91, 179272.0, 162877.44, 80913.01, 47723.73, 33740.82, 30694.62, 19003.31, 6607.12],
+                    realizado: [140136.83, 23389.87, 80661.78, 108687.67, 179581.37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 }
-            } finally {
-                btnIcon.style.animation = '';
-                btnAtualizar.disabled = false;
-            }
+            };
+            console.log('Mock carregado. Datas:', Object.keys(dadosTodos));
+            selectedDatesSet.clear();
+            lastSingleDate = null;
+            document.getElementById('btnClearSelection').style.display = 'none';
+            popularDatas();
+            if (document.getElementById('timestampApi').innerHTML.indexOf('Modo demonstração') === -1)
+                document.getElementById('timestampApi').innerHTML = '<i class="bi bi-info-circle"></i> Dados locais (conecte a API para dados em tempo real)';
+            console.log('Datas ordenadas:', datasOrdem);
         }
-        function loadMockData() {
-            anoAnterior = [224072.08, 27726.64, 100031.16, 138521.57, 215568.62, 199586.58, 170781.49, 101698.68, 130408.05, 183136.11, 165201.59, 124433.61, 60988.98, 46350.96, 16667.06, 17444.28, 8763.38, 4109.51];
-            semanaAnterior = anoAnterior.map(v => v * 0.97);
-            diaAnterior = anoAnterior.map(v => v * 0.95);
-            realizado = [166791.65, 10966.89, 91099.95, 118773.8, 204295.04, 167117.6, 127122.32, 150681.47, 134825.33, 158011.86, 0, 0, 0, 0, 0, 0, 0, 0];
-            fullUpdate();
-            document.getElementById('timestampApi').innerHTML = '<i class="bi bi-info-circle"></i> Dados de exemplo (fallback)';
-        }
-        function toggleFilter(fid) {
-            if (activeFilters.has(fid)) activeFilters.delete(fid);
-            else activeFilters.add(fid);
-            document.querySelectorAll('.filter-card').forEach(card => { if (card.dataset.filter) card.classList.toggle('filter-active', activeFilters.has(card.dataset.filter)); });
-            rebuildChart();
-            renderTable();
-        }
-        document.querySelectorAll('.filter-card').forEach(card => { if (card.dataset.filter) card.addEventListener('click', () => toggleFilter(card.dataset.filter)); });
-        document.getElementById('btnResetFiltros').addEventListener('click', () => { activeFilters.clear(); document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('filter-active')); rebuildChart(); renderTable(); });
-        // Botão atualizar sempre força busca na API, ignorando cache
-        document.getElementById('btnAtualizar').addEventListener('click', () => buscarDadosDaAPI({ forcarAPI: true }));
-        let resizeTimer;
-        window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { rebuildChart(); renderTable(); }, 150); });
-        // Carga inicial usa cache se disponível
-        buscarDadosDaAPI();
-        // Intervalo de 5min usa cache (não força API) — só vai à API se o cache expirou
-        setInterval(() => buscarDadosDaAPI({ forcarAPI: false }), CACHE_INTERVAL_MS);
+
+        // ==================== INIT ====================
+        let rt;
+        window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { buildChart(); renderTable(); }, 150); });
+        buscarDados();
     </script>
 </body>
 
